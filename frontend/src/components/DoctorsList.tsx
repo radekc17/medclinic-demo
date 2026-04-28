@@ -12,7 +12,7 @@ export interface Service {
 export interface Doctor {
   id: number;
   specialization: string;
-  photoUrl?: string | null; // Kluczowe pole z Twojego seeda
+  photoUrl?: string | null;
   services: Service[];
   user: { 
     name: string; 
@@ -98,19 +98,19 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
   }, [doctors, filterSpec, searchQuery]);
 
   return (
-    <div style={{maxWidth: '1200px', margin: '0 auto', padding: '0 20px'}}>
+    <div className="doctors-list-wrapper" style={{maxWidth: '1200px', margin: '0 auto', padding: '0 20px'}}>
       
-      <header style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
+      <header className="doctors-header" style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
         <h2 style={{fontSize: '2.5rem', fontWeight: 900, color: '#0f172a', marginBottom: '10px'}}>{t.doctorsTitle}</h2>
         <p style={{fontSize: '1.1rem', color: '#64748b'}}>{t.subtitle}</p>
       </header>
 
       {/* PASEK FILTRÓW */}
-      <div style={{
+      <div className="filters-bar" style={{
         background: 'white', padding: '25px', borderRadius: '16px', border: '1px solid #e2e8f0',
         marginBottom: '40px', display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-end', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
       }}>
-        <div style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '250px'}}>
+        <div className="filter-input-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '250px'}}>
           <label style={{fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px'}}>{t.filterCat}</label>
           <select 
             value={filterSpec} 
@@ -124,7 +124,7 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
           </select>
         </div>
 
-        <div style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '250px'}}>
+        <div className="filter-input-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '250px'}}>
           <label style={{fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px'}}>Szukaj lekarza</label>
           <input 
             type="text" 
@@ -143,9 +143,9 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
           {t.noDoctors}
         </div>
       ) : (
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '30px'}}>
+        <div className="doctors-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '30px'}}>
           {processedDoctors.map((doctor) => (
-            <div key={doctor.id} style={{
+            <div key={doctor.id} className="doctor-card" style={{
               background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '25px',
               display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease-in-out', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)'
             }}>

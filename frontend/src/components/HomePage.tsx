@@ -6,7 +6,7 @@ interface Props {
   onBookClick: () => void;
   clinicData?: any; 
   allClinics?: any[]; 
-  onClinicSelect?: (clinicId: number) => void; // <--- DODANO NOWY PROP
+  onClinicSelect?: (clinicId: number) => void;
 }
 
 const pageContent = {
@@ -95,22 +95,21 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
   if (!clinicData) {
     return (
       <div style={{background: 'white', color: '#0f172a', fontFamily: '"Open Sauce", sans-serif'}}>
-        <section style={{...styles.heroFull, backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.5)), url('/clinic_interior.jpg')`}}>
-          <div style={styles.heroContentCentered}>
+        <section className="hero-section" style={{...styles.heroFull, backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.5)), url('/clinic_interior.jpg')`}}>
+          <div style={styles.heroContentCentered} className="hero-content">
             <span style={styles.heroTag}>MedClinic</span>
-            <h1 style={styles.heroTitleCentered}>{c.heroTitle} <br/><span style={{color: '#facc15'}}>{c.heroHighlight}</span>.</h1>
-            <p style={styles.heroTextCentered}>{c.heroSubtitle}</p>
+            <h1 className="hero-title" style={styles.heroTitleCentered}>{c.heroTitle} <br/><span style={{color: '#facc15'}}>{c.heroHighlight}</span>.</h1>
+            <p className="hero-subtitle" style={styles.heroTextCentered}>{c.heroSubtitle}</p>
             <div style={{marginTop: '30px'}}>
               <button onClick={onBookClick} style={styles.btnSolidWhite}>{t.bookBtn}</button>
             </div>
           </div>
         </section>
 
-        <section style={{padding: '100px 5vw', background: '#f8fafc', textAlign: 'center'}}>
-          <h2 style={styles.sectionTitleCenter}>Nasze <span style={{color: '#2563eb'}}>Lokalizacje</span></h2>
-          <div style={{...styles.offeringGrid, gap: '40px'}}>
+        <section style={{padding: '100px 5vw', background: '#f8fafc', textAlign: 'center'}} className="locations-section">
+          <h2 className="section-title" style={styles.sectionTitleCenter}>Nasze <span style={{color: '#2563eb'}}>Lokalizacje</span></h2>
+          <div className="offering-grid" style={{...styles.offeringGrid, gap: '40px'}}>
             {allClinics.map((clinic, i) => (
-              // ZMIANA: Z div na button, by obsłużyć kliknięcie
               <button 
                 key={i} 
                 onClick={() => onClinicSelect && onClinicSelect(clinic.id)}
@@ -121,7 +120,6 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
                   border: 'none', 
                   background: 'white', 
                   cursor: 'pointer',
-                  // Prosty hack na hover za pomocą onMouseOver by zachować inline-styles
                 }}
                 onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.1)'; }}
                 onMouseOut={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
@@ -140,37 +138,36 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
     );
   }
 
-  // DYNAMICZNIE GENEROWANY LINK DO GOOGLE MAPS NA BAZIE ADRESU Z BAZY DANYCH
   const mapQuery = encodeURIComponent(`${clinicData.name} ${clinicData.address}`);
-  const mapUrl = `https://maps.google.com/maps?q=${mapQuery}&t=m&z=15&output=embed&iwloc=near`; // Uaktualniony bezpieczny URL dla Google Maps
+  const mapUrl = `https://maps.google.com/maps?q=${mapQuery}&t=m&z=15&output=embed&iwloc=near`;
 
   return (
     <div style={{background: 'white', color: '#0f172a', fontFamily: '"Open Sauce", sans-serif'}}>
       
-      <section style={{...styles.heroFull, backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.4)), url('/hero_dental.png')`}}>
-        <div style={styles.heroContentCentered}>
+      <section className="hero-section" style={{...styles.heroFull, backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.4)), url('/hero_dental.png')`}}>
+        <div style={styles.heroContentCentered} className="hero-content">
           <span style={styles.heroTag}>MedClinic: {clinicData.name}</span>
-          <h1 style={styles.heroTitleCentered}>{c.heroTitle} <br/><span style={{color: '#facc15'}}>{c.heroHighlight}</span>.</h1>
-          <p style={styles.heroTextCentered}>{c.heroSubtitle}</p>
+          <h1 className="hero-title" style={styles.heroTitleCentered}>{c.heroTitle} <br/><span style={{color: '#facc15'}}>{c.heroHighlight}</span>.</h1>
+          <p className="hero-subtitle" style={styles.heroTextCentered}>{c.heroSubtitle}</p>
           <div style={{marginTop: '30px'}}>
             <button onClick={onBookClick} style={styles.btnSolidWhite}>{t.bookBtn}</button>
           </div>
         </div>
       </section>
 
-      <section style={styles.splitSection}>
-        <div style={styles.splitTextContent}>
-          <h2 style={styles.sectionTitleLeft}>{c.servingTitle}<br/><span style={{color: '#2563eb'}}>2001</span>.</h2>
-          <p style={styles.paragraph}>{c.servingDesc}</p>
+      <section className="split-section" style={styles.splitSection}>
+        <div className="split-text" style={styles.splitTextContent}>
+          <h2 className="section-title-left" style={styles.sectionTitleLeft}>{c.servingTitle}<br/><span style={{color: '#2563eb'}}>2001</span>.</h2>
+          <p className="split-paragraph" style={styles.paragraph}>{c.servingDesc}</p>
           <button onClick={onBookClick} style={styles.linkArrow}>{c.priceBtn}</button>
         </div>
-        <div style={{...styles.splitImage, backgroundImage: `url('/woman_smile.jpg')`}}></div>
+        <div className="split-img" style={{...styles.splitImage, backgroundImage: `url('/woman_smile.jpg')`}}></div>
       </section>
 
-      <section style={styles.offeringSection}>
+      <section className="offering-section" style={styles.offeringSection}>
         <span style={styles.offeringTag}>{c.offerTag}</span>
-        <h2 style={styles.sectionTitleCenter}>{c.offerTitle} <br/><span style={{color: '#2563eb'}}>{c.offerHighlight}</span></h2>
-        <div style={styles.offeringGrid}>
+        <h2 className="section-title" style={styles.sectionTitleCenter}>{c.offerTitle} <br/><span style={{color: '#2563eb'}}>{c.offerHighlight}</span></h2>
+        <div className="offering-grid" style={styles.offeringGrid}>
           {offering.map((item, i) => (
             <div key={i} style={styles.offeringCard}>
               <div style={styles.cardIcon}>🩺</div>
@@ -181,8 +178,8 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
         </div>
       </section>
 
-      <section style={{display: 'flex', flexWrap: 'wrap', minHeight: '70vh'}}>
-        <div style={{flex: 1, minWidth: '300px', background: '#e2e8f0'}}>
+      <section className="footer-split" style={{display: 'flex', flexWrap: 'wrap', minHeight: '70vh'}}>
+        <div className="map-container" style={{flex: 1, minWidth: '300px', background: '#e2e8f0'}}>
           <iframe 
             src={mapUrl} 
             width="100%" 
@@ -194,8 +191,8 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
           ></iframe>
         </div>
         
-        <div style={{flex: 1, padding: '8vw 5vw', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#0f172a', color: 'white'}}>
-          <h2 style={{...styles.sectionTitleLeft, color: 'white'}}>{c.footerTitle}<br/><span style={{color: '#60a5fa'}}>{c.footerHighlight}</span>.</h2>
+        <div className="footer-content" style={{flex: 1, padding: '8vw 5vw', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#0f172a', color: 'white'}}>
+          <h2 className="section-title-left" style={{...styles.sectionTitleLeft, color: 'white'}}>{c.footerTitle}<br/><span style={{color: '#60a5fa'}}>{c.footerHighlight}</span>.</h2>
           
           <div style={{...styles.contactList, color: '#e2e8f0'}}>
             <div style={styles.contactItem}><span style={{fontSize: '1.5rem'}}>📍</span> {clinicData.address}</div>
