@@ -118,7 +118,7 @@ function AppContent() {
     fetchDoctorsAndClinics();
   }, []);
 
-  // SYNCHRONIZACJA JĘZYKA Z URL (np. wchodzisz na /en -> ustawia język EN)
+  // SYNCHRONIZACJA JĘZYKA Z URL
   useEffect(() => {
     const parts = location.pathname.split('/');
     const urlLang = parts[1]?.toUpperCase();
@@ -137,7 +137,6 @@ function AppContent() {
     }
   }, [location.pathname]);
 
-  // NOWA NAWIGACJA Z JĘZYKIEM
   const handleNavigate = (view: View) => {
     handleCloseModal(); 
     if (view !== 'list' && view !== 'directory') {
@@ -151,7 +150,6 @@ function AppContent() {
     window.scrollTo(0, 0); 
   };
 
-  // ZMIANA JĘZYKA Z PRZEKIEROWANIEM URL
   const changeLanguage = (newLang: Language) => {
     setLang(newLang);
     setIsLangMenuOpen(false);
@@ -213,7 +211,6 @@ function AppContent() {
     
   const canSwitchClinic = !user || ['ADMIN', 'MANAGER', 'PATIENT'].includes(user.role);
 
-  // WIDOK TV - PEŁNY EKRAN
   if (location.pathname.includes('/tv')) {
       return (
           <div className="tv-mode-wrapper">
@@ -223,6 +220,10 @@ function AppContent() {
           </div>
       );
   }
+
+  // Przygotowanie numeru telefonu do Click-to-call
+  const rawPhone = activeClinicData?.phone || '+48 22 111 22 33';
+  const dialPhone = rawPhone.replace(/\s+/g, '');
 
   return (
     <div className="app-container modern-theme" onClick={() => { setIsMenuOpen(false); setIsMobileMenuOpen(false); setIsLangMenuOpen(false); }} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif', width: '100%', overflowX: 'hidden'}}> 
@@ -249,17 +250,20 @@ function AppContent() {
         />
       )}
 
-      <header className="modern-header" style={{ background: 'rgba(255,255,255,0.98)', borderBottom: '1px solid #f1f5f9', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(10px)' }}>
+      <header className="modern-header">
         
-        {/* Jasny pasek górny (zastępuje czarny) */}
-        <div style={{ background: '#f8fafc', padding: '8px 5vw', color: '#475569', fontSize: '0.85rem', borderBottom: '1px solid #e2e8f0' }}>
-          <div className="top-bar-mobile" style={{ maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <div className="top-bar-info" style={{ display: 'flex', gap: '20px', alignItems: 'center', fontWeight: 600 }}>
-              <span style={{color: '#475569'}}>📞 Info: {activeClinicData?.phone || '+48 22 111 22 33'}</span>
+        {/* NOWOCZESNY PASEK INFORMACYJNY (Click-to-call wbudowany) */}
+        <div className="top-info-bar">
+          <div className="header-container">
+            <div className="top-info-left">
+              <a href={`tel:${dialPhone}`} className="phone-pill">
+                <span className="icon">📞</span>
+                <span className="text">{rawPhone}</span>
+              </a>
               
               {canSwitchClinic && (
-                <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#2563eb'}}>
-                  📍 
+                <div className="location-pill">
+                  <span className="icon">📍</span>
                   <select 
                     value={selectedClinicId || ''} 
                     onChange={(e) => {
@@ -267,7 +271,6 @@ function AppContent() {
                       if (val) navigateUrl(`/${lang.toLowerCase()}/klinika/${val}`); 
                       else navigateUrl(`/${lang.toLowerCase()}`); 
                     }}
-                    style={{ background: 'transparent', border: 'none', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer', outline: 'none' }}
                   >
                     <option value="">Wszystkie placówki</option>
                     {clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -276,111 +279,78 @@ function AppContent() {
               )}
             </div>
 
-            <div className="top-bar-flags" style={{position: 'relative'}}>
-              <button 
-                onClick={(e) => { e.stopPropagation(); setIsLangMenuOpen(!isLangMenuOpen); }}
-                style={{ background: 'white', border: '1px solid #cbd5e1', color: '#0f172a', padding: '4px 12px', borderRadius: '50px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', fontSize: '0.8rem', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}
-              >
-                <img src={`https://flagcdn.com/w20/${lang === 'EN' ? 'gb' : lang === 'UA' ? 'ua' : 'pl'}.png`} alt={lang} style={{width: '16px', borderRadius: '2px'}} /> 
-                {lang} ▾
-              </button>
-              
-              {isLangMenuOpen && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '16px', overflow: 'hidden', zIndex: 1000, boxShadow: '0 10px 25px rgba(0,0,0,0.05)', minWidth: '100px' }}>
-                  {(['PL', 'EN', 'UA'] as Language[]).map(l => (
-                    <div 
-                      key={l} onClick={() => changeLanguage(l)}
-                      style={{ padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', background: lang === l ? '#f8fafc' : 'white', borderBottom: '1px solid #f1f5f9' }}
-                    >
-                      <img src={`https://flagcdn.com/w20/${l === 'EN' ? 'gb' : l === 'UA' ? 'ua' : 'pl'}.png`} alt={l} style={{width: '16px', borderRadius: '2px'}} /> 
-                      <span style={{fontWeight: lang === l ? '800' : '600', color: '#0f172a'}}>{l}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className="top-info-right">
+              <div className="lang-selector-modern">
+                <button onClick={(e) => { e.stopPropagation(); setIsLangMenuOpen(!isLangMenuOpen); }}>
+                  <img src={`https://flagcdn.com/w20/${lang === 'EN' ? 'gb' : lang === 'UA' ? 'ua' : 'pl'}.png`} alt={lang} /> 
+                  <span className="lang-code">{lang}</span>
+                </button>
+                
+                {isLangMenuOpen && (
+                  <div className="lang-dropdown-modern">
+                    {(['PL', 'EN', 'UA'] as Language[]).map(l => (
+                      <div key={l} onClick={() => changeLanguage(l)} className="lang-option">
+                        <img src={`https://flagcdn.com/w20/${l === 'EN' ? 'gb' : l === 'UA' ? 'ua' : 'pl'}.png`} alt={l} /> 
+                        <span>{l}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <nav style={{ padding: '15px 5vw', maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px', boxSizing: 'border-box' }} onClick={(e) => e.stopPropagation()}>
-          <div className="nav-header-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 'auto' }}>
-            <h1 onClick={() => handleNavigate('home')} style={{cursor: 'pointer', margin: 0, fontSize: '1.6rem', fontWeight: 900, color: '#2563eb', letterSpacing: '-1px'}}>
-              {activeClinicData?.name || t.title}
-            </h1>
-            <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', fontSize: '1.8rem', cursor: 'pointer', color: '#0f172a' }}>
-              {isMobileMenuOpen ? '✕' : '☰'}
-            </button>
-          </div>
-
-          <div className={`nav-links-container ${isMobileMenuOpen ? 'open' : ''}`} style={{display: 'flex', alignItems: 'center', gap: '30px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end'}}>
-            <div className="nav-links-mobile" style={{display: 'flex', gap: '20px', alignItems: 'center', fontWeight: 700, fontSize: '0.95rem', color: '#475569'}}>
-              <span className="modern-link" onClick={() => handleNavigate('home')} style={{cursor: 'pointer', color: currentView === 'home' ? '#2563eb' : 'inherit'}}>{t.navClinic}</span>
-              <span className="modern-link" onClick={() => handleNavigate('directory')} style={{cursor: 'pointer', color: currentView === 'directory' ? '#2563eb' : 'inherit'}}>{t.navOurDoctors}</span>
-              <button className="pill-btn-primary" onClick={() => handleNavigate('list')}>{t.bookBtn}</button>
+        {/* GŁÓWNA NAWIGACJA */}
+        <nav className="main-navbar">
+          <div className="header-container">
+            <div className="brand" onClick={() => handleNavigate('home')}>
+              <h1 className="logo-text">Med<span>Clinic</span></h1>
             </div>
 
-            <div className="navbar-user-mobile">
-              {user ? (
-                <div style={{position: 'relative'}}>
-                  <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="pill-btn-outline">
-                    👤 {user.name} ({user.role}) ▾
-                  </button>
-                  {isMenuOpen && (
-                    <div className="dropdown-menu modern-dropdown" style={{position: 'absolute', top: '100%', right: 0, marginTop: '10px', background: 'white', border: '1px solid #f1f5f9', borderRadius: '20px', boxShadow: '0 15px 35px rgba(0,0,0,0.05)', minWidth: '260px', zIndex: 100, overflow: 'hidden', padding: '10px'}}>
-                      {user.role === 'DOCTOR' && (
-                        <>
-                            <div onClick={() => handleNavigate('doctor-panel')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>👨‍⚕️ Pilot Wizyt</div>
-                            <div onClick={() => handleNavigate('schedule')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 Mój Grafik</div>
-                        </>
-                      )}
-                      {user.role === 'RECEPTIONIST' && (
-                        <>
-                            <div onClick={() => handleNavigate('quick-search')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#16a34a'}}>🔍 Wyszukaj Termin</div>
-                            <div onClick={() => handleNavigate('reception-panel')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🏢 Radar Gabinetów</div>
-                            <div onClick={() => handleNavigate('patients-registry')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🗂️ Kartoteka Pacjentów</div>
-                            <div onClick={() => handleNavigate('schedule')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 Grafik Pracy</div>
-                        </>
-                      )}
-                      {(user.role === 'MANAGER' || user.role === 'ADMIN') && (
-                        <>
-                            <div className="menu-title" style={{fontSize: '0.75rem', color: '#94a3b8', padding: '10px 20px', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px'}}>Zarządzanie</div>
-                            <div onClick={() => handleNavigate('quick-search')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#16a34a'}}>🔍 Wyszukaj Termin</div>
-                            <div onClick={() => handleNavigate('schedule')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 Planowanie Grafiku</div>
-                            <div onClick={() => handleNavigate('patients-registry')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🗂️ Baza Pacjentów</div>
-                            <div onClick={() => handleNavigate('reception-panel')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🏢 Podgląd Recepcji</div>
-                            {user.role === 'ADMIN' && (
-                              <>
-                                <div onClick={() => handleNavigate('settings')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>⚙️ Ustawienia Systemu</div>
-                                <div onClick={() => handleNavigate('tv-view')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#2563eb'}}>📺 Uruchom Ekran TV</div>
-                              </>
-                            )}
-                        </>
-                      )}
-                      {user.role === 'PATIENT' && (
-                        <>
-                           <div onClick={() => handleNavigate('list')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 {t.bookBtn}</div>
-                           <div onClick={() => handleNavigate('my-appointments')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📋 {t.myAppointments}</div>
-                        </>
-                      )}
-                      <div onClick={() => handleNavigate('profile')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>⚙️ {t.navProfile}</div>
-                      <div onClick={handleLogout} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#dc2626', borderTop: '1px solid #f1f5f9', marginTop: '5px'}}>🚪 {t.logout}</div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="login-buttons-mobile" style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
-                  <button onClick={() => handleNavigate('check-guest')} className="pill-btn-ghost" style={{background: 'transparent', color: '#475569', border: 'none', fontWeight: 700, cursor: 'pointer'}}>🔍 {t.checkGuestBtn}</button>
+            <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? '✕' : '☰'}
+            </button>
+
+            <div className={`nav-links-wrapper ${isMobileMenuOpen ? 'open' : ''}`}>
+              <div className="primary-links">
+                <span className="nav-item" onClick={() => handleNavigate('home')} style={{color: currentView === 'home' ? '#2563eb' : 'inherit'}}>{t.navClinic}</span>
+                <span className="nav-item" onClick={() => handleNavigate('directory')} style={{color: currentView === 'directory' ? '#2563eb' : 'inherit'}}>{t.navOurDoctors}</span>
+                <span className="nav-item" onClick={() => handleNavigate('check-guest')}>🔍 {t.checkGuestBtn}</span>
+              </div>
+
+              <div className="auth-actions">
+                <button className="pill-btn-primary" onClick={() => handleNavigate('list')}>{t.bookBtn}</button>
+                
+                {user ? (
+                  <div className="user-nav-container">
+                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="pill-btn-outline user-btn">
+                      👤 {user.name.split(' ')[0]} ▾
+                    </button>
+                    {isMenuOpen && (
+                      <div className="user-dropdown-modern">
+                        {user.role === 'DOCTOR' && (
+                          <div onClick={() => handleNavigate('doctor-panel')} className="drop-item">👨‍⚕️ Pilot Wizyt</div>
+                        )}
+                        {['RECEPTIONIST', 'MANAGER', 'ADMIN'].includes(user.role) && (
+                          <div onClick={() => handleNavigate('quick-search')} className="drop-item highlight">🔍 Wyszukaj Termin</div>
+                        )}
+                        <div onClick={() => handleNavigate('profile')} className="drop-item">⚙️ {t.navProfile}</div>
+                        <div onClick={handleLogout} className="drop-item logout">🚪 {t.logout}</div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
                   <button onClick={() => handleNavigate('login')} className="pill-btn-outline">{t.login}</button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </nav>
       </header>
 
-      <main className="main-content modern-bg" style={{ flex: 1, boxSizing: 'border-box' }}>
+      <main className="app-main-content modern-bg" style={{ flex: 1, boxSizing: 'border-box' }}>
         <Routes>
-          {/* Przekierowanie na domyślny język */}
           <Route path="/" element={<Navigate to="/pl" replace />} />
           
           <Route path="/:lang" element={
@@ -456,7 +426,7 @@ function AppContent() {
               <h4 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '20px', color: '#0f172a' }}>Kontakt</h4>
               <p style={{ fontSize: '0.95rem', lineHeight: 1.6, margin: 0, fontWeight: 600 }}>
                 {activeClinicData?.address || 'ul. Zdrowa 15, 00-123 Warszawa'}<br/>
-                📞 {activeClinicData?.phone || '+48 22 111 22 33'}<br/>
+                <a href={`tel:${dialPhone}`} style={{textDecoration: 'none', color: 'inherit'}}>📞 {rawPhone}</a><br/>
                 📧 {activeClinicData?.email || 'centrala@medclinic.pl'}
               </p>
             </div>
