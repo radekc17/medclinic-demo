@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import { LoginForm } from './components/LoginForm';
 import { RegisterForm } from './components/RegisterForm';
@@ -20,12 +21,33 @@ import { Toaster, toast } from 'react-hot-toast';
 
 type View = 'home' | 'directory' | 'list' | 'login' | 'register' | 'my-appointments' | 'check-guest' | 'doctor-panel' | 'profile' | 'reception-panel' | 'schedule' | 'patients-registry' | 'settings' | 'tv-view' | 'quick-search';
 
-function App() {
+// MAPOWANIE: Przypisujemy stare "widoki" do nowych, prawdziwych adresów URL SEO-friendly
+const viewToPath: Record<View, string> = {
+  'home': '/',
+  'directory': '/nasi-lekarze',
+  'list': '/umow-wizyte',
+  'login': '/logowanie',
+  'register': '/rejestracja',
+  'profile': '/moj-profil',
+  'doctor-panel': '/panel-lekarza',
+  'reception-panel': '/radar-gabinetow',
+  'schedule': '/grafik',
+  'patients-registry': '/kartoteka',
+  'settings': '/ustawienia',
+  'quick-search': '/wyszukaj-termin',
+  'check-guest': '/sprawdz-wizyte',
+  'my-appointments': '/moje-wizyty',
+  'tv-view': '/tv'
+};
+
+function AppContent() {
+  const navigateUrl = useNavigate();
+  const location = useLocation();
+
   const [lang, setLang] = useState<Language>('PL');
   const t = translations[lang];
 
   const [user, setUser] = useState<any>(null);
-  
   const [clinics, setClinics] = useState<any[]>([]);
   const [selectedClinicId, setSelectedClinicId] = useState<number | null>(null);
   
@@ -36,13 +58,15 @@ function App() {
   const [preselectedDate, setPreselectedDate] = useState<string | null>(null);
   const [preselectedTime, setPreselectedTime] = useState<string | null>(null); 
   
-  const [currentView, setCurrentView] = useState<View>('home');
   const [guestPeselInput, setGuestPeselInput] = useState('');
   const [activeGuestPesel, setActiveGuestPesel] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false); // <--- NOWY STAN DLA FLAG
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [prefilledPatient, setPrefilledPatient] = useState<any>(null);
+
+  // Zgadywanie aktualnego "widoku" na podstawie URL, żeby podświetlenia w menu działały jak dawniej
+  const currentView = (Object.keys(viewToPath) as View[]).find(key => viewToPath[key] === location.pathname) || 'home';
 
   const handleCloseModal = () => {
     setSelectedDoctor(null);
@@ -91,11 +115,23 @@ function App() {
   useEffect(() => {
     loadUser();
     fetchDoctorsAndClinics();
-
-    if (window.location.pathname === '/tv') {
-      setCurrentView('tv-view');
-    }
   }, []);
+
+  // NOWA FUNKCJA NAWIGACJI - Zgodna z React Routerem
+  const handleNavigate = (view: View) => {
+    handleCloseModal(); 
+    
+    if (view !== 'list' && view !== 'directory') {
+      setPrefilledPatient(null);
+    }
+
+    setIsMenuOpen(false);
+    setIsMobileMenuOpen(false); 
+    setIsLangMenuOpen(false);
+    
+    navigateUrl(viewToPath[view]);
+    window.scrollTo(0, 0); 
+  };
 
   const handleLoginSuccess = (userData: any, accessToken: string) => {
     localStorage.setItem('token', accessToken);
@@ -112,38 +148,23 @@ function App() {
         setSelectedClinicId(fullUser.clinicId);
       }
       
-      if (fullUser.role === 'DOCTOR') navigate('doctor-panel');
-      else if (fullUser.role === 'RECEPTIONIST') navigate('reception-panel');
-      else if (fullUser.role === 'MANAGER' || fullUser.role === 'ADMIN') navigate('schedule');
-      else navigate('home');
+      if (fullUser.role === 'DOCTOR') handleNavigate('doctor-panel');
+      else if (fullUser.role === 'RECEPTIONIST') handleNavigate('reception-panel');
+      else if (fullUser.role === 'MANAGER' || fullUser.role === 'ADMIN') handleNavigate('schedule');
+      else handleNavigate('home');
     })
     .catch(err => {
       console.error(err);
       setUser(userData); 
-      navigate('home');
+      handleNavigate('home');
     });
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('token');
-    navigate('home');
-    setIsMenuOpen(false);
-    setIsMobileMenuOpen(false);
+    handleNavigate('home');
     toast.success('Wylogowano pomyślnie');
-  };
-
-  const navigate = (view: View) => {
-    handleCloseModal(); 
-    
-    if (view !== 'list' && view !== 'directory') {
-      setPrefilledPatient(null);
-    }
-
-    setCurrentView(view);
-    setIsMenuOpen(false);
-    setIsMobileMenuOpen(false); 
-    window.scrollTo(0, 0); 
   };
 
   const handleGuestCheckSubmit = (e: React.FormEvent) => {
@@ -154,7 +175,7 @@ function App() {
 
   const handleBookForPatient = (patient: any) => {
     setPrefilledPatient(patient);
-    navigate('list');
+    handleNavigate('list');
     toast.success(`Wybrano: ${patient.name}. Wybierz lekarza.`);
   };
 
@@ -165,120 +186,14 @@ function App() {
     
   const canSwitchClinic = !user || ['ADMIN', 'MANAGER', 'PATIENT'].includes(user.role);
 
-  const renderContent = () => {
-    if (currentView === 'tv-view') return <TvQueueView />;
-
-    if (currentView === 'home') return (
-      <HomePage 
-        lang={lang} 
-        clinicData={activeClinicData} 
-        allClinics={clinics} 
-        onBookClick={() => navigate('list')} 
-        onClinicSelect={(id) => {
-          setSelectedClinicId(id);
-          window.scrollTo(0, 0); 
-        }} 
-      />
-    );
-
-    if (currentView === 'directory') return <DoctorsDirectory lang={lang} doctors={clinicSpecificDoctors} onBookDirectly={(doc: Doctor, svc?: any) => { setPreselectedService(svc); setSelectedDoctor(doc); }} />;
-
-    if (currentView === 'login') return (
-      <div className="auth-container" style={{padding: '80px 20px'}}>
-        <div className="auth-card" style={{margin: '0 auto'}}>
-          <LoginForm onLoginSuccess={handleLoginSuccess} />
-          <p style={{marginTop: '15px', textAlign: 'center'}}>
-                Nie masz konta? <span onClick={() => navigate('register')} style={{color: '#2563eb', cursor: 'pointer', fontWeight: 'bold'}}>Zarejestruj się</span>
-          </p>
-        </div>
-      </div>
-    );
-
-    if (currentView === 'register') return (
-      <div className="auth-container" style={{padding: '80px 20px'}}>
-        <RegisterForm onSuccess={() => navigate('login')} onSwitchToLogin={() => navigate('login')} lang={lang} />
-      </div>
-    );
-
-    if (currentView === 'profile') return <div style={{padding: '50px 5vw'}}><UserProfile user={user} onUpdateUser={(updated: any) => setUser(updated)} lang={lang} /></div>;
-
-    if (currentView === 'doctor-panel') {
-      if (user?.role !== 'DOCTOR') return <p>Brak uprawnień.</p>;
-      return <DoctorDashboard />;
-    }
-
-    if (currentView === 'reception-panel') {
-      if (!['RECEPTIONIST', 'ADMIN', 'MANAGER'].includes(user?.role)) return <p>Brak uprawnień recepcji.</p>;
-      return <ReceptionPanel user={user} onBookVisit={handleBookForPatient} />;
-    }
-
-    if (currentView === 'schedule') {
-        if (!user) return <p>Zaloguj się.</p>;
-        return <SchedulePanel userRole={user.role} userId={user.id} />;
-    }
-
-    if (currentView === 'patients-registry') {
-        if (!['RECEPTIONIST', 'ADMIN', 'MANAGER'].includes(user?.role)) return <p>Brak uprawnień.</p>;
-        return <PatientsRegistry onBookVisit={handleBookForPatient} />;
-    }
-
-    if (currentView === 'settings') {
-      if (user?.role !== 'ADMIN') return <p>Brak uprawnień.</p>;
-      return <AdminSettings onRefreshData={fetchDoctorsAndClinics} />;
-    }
-
-    if (currentView === 'quick-search') {
-        if (!['RECEPTIONIST', 'MANAGER', 'ADMIN'].includes(user?.role)) return <p>Brak uprawnień.</p>;
-        return (
-            <QuickSearch 
-                doctors={clinicSpecificDoctors} 
-                onBook={(doc, svc, date, time) => {
-                    setPreselectedService(svc);
-                    setPreselectedDate(date);
-                    setPreselectedTime(time);
-                    setSelectedDoctor(doc);
-                }} 
-            />
-        );
-    }
-    
-    if (currentView === 'check-guest') return (
-      <div style={{maxWidth: '800px', width: '95%', margin: '80px auto'}}>
-        <div style={{background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', textAlign: 'center', border: '1px solid #e2e8f0'}}>
-          <div style={{maxWidth: '500px', margin: '0 auto 30px auto'}}>
-            <h2 style={{color: '#2563eb', marginBottom: '10px', fontSize: '2rem', fontWeight: 900}}>{t.checkGuestTitle}</h2>
-            <form onSubmit={handleGuestCheckSubmit} style={{display: 'flex', gap:'10px'}}>
-              <input type="text" placeholder={t.peselPlaceholder} value={guestPeselInput} onChange={(e) => setGuestPeselInput(e.target.value.replace(/\D/g, ''))} maxLength={11} style={{flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box'}}/>
-              <button type="submit" className="btn-logout" style={{width: 'auto', padding: '0 20px', background: '#0f172a', color: 'white', border: 'none'}}>{t.searchBtn}</button>
-            </form>
-          </div>
-          {activeGuestPesel && <div style={{textAlign: 'left', borderTop: '1px solid #e2e8f0', paddingTop: '20px'}}><MyAppointments lang={lang} guestPesel={activeGuestPesel} /></div>}
-        </div>
-      </div>
-    );
-
-    if (currentView === 'my-appointments') return <div style={{padding: '50px 0'}}><MyAppointments lang={lang} /></div>;
-
-    // NAPRAWA: Zadbano o to, by nic nie wychodziło poza ekran na mobile (box-sizing i width 100%)
-    return (
-      <div style={{padding: '60px 5vw', maxWidth: '1440px', margin: 'auto', boxSizing: 'border-box', width: '100%'}}>
-        {loading ? <div style={{textAlign:'center', padding: '50px'}}>Wczytywanie lekarzy...</div> : (
-          <DoctorsList doctors={clinicSpecificDoctors} loading={loading} lang={lang} onBook={(doc) => { setPreselectedService(null); setSelectedDoctor(doc); }} />
-        )}
-      </div>
-    );
-  };
-
-  if (currentView === 'tv-view') {
+  // SPECJALNY WIDOK DLA TV (Przejmuje cały ekran, omija resztę strony)
+  if (location.pathname === viewToPath['tv-view']) {
       return (
           <div className="tv-mode-wrapper">
               <Toaster position="top-center" />
-              {renderContent()}
+              <TvQueueView />
               <button 
-                onClick={() => {
-                  window.history.pushState({}, '', '/');
-                  navigate('home');
-                }} 
+                onClick={() => handleNavigate('home')} 
                 style={{position:'fixed', bottom: 10, right: 10, opacity: 0.1, border:'none', background:'none', color:'white', cursor: 'pointer'}}
               >
                 Wyjdź z TV
@@ -287,7 +202,6 @@ function App() {
       );
   }
 
-  // Upewniamy się, że kliknięcie gdziekolwiek zamyka otwarte menu języków i inne dropdowny
   return (
     <div className="app-container" onClick={() => { setIsMenuOpen(false); setIsMobileMenuOpen(false); setIsLangMenuOpen(false); }} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif', width: '100%', overflowX: 'hidden'}}> 
       <Toaster position="top-center" />
@@ -308,7 +222,7 @@ function App() {
             
             setTimeout(() => {
               const isStaff = user && ['RECEPTIONIST', 'MANAGER', 'ADMIN'].includes(user.role);
-              navigate(isStaff ? 'patients-registry' : 'my-appointments'); 
+              handleNavigate(isStaff ? 'patients-registry' : 'my-appointments'); 
             }, 0);
           }}
         />
@@ -329,7 +243,7 @@ function App() {
                     onChange={(e) => {
                       const val = e.target.value;
                       setSelectedClinicId(val ? parseInt(val) : null);
-                      navigate('home');
+                      handleNavigate('home');
                     }}
                     style={{ 
                       background: '#1e293b', 
@@ -359,7 +273,6 @@ function App() {
               )}
             </div>
 
-            {/* NOWE, CZYSTE MENU JĘZYKÓW (1 KLIK) */}
             <div className="top-bar-flags" style={{position: 'relative'}}>
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsLangMenuOpen(!isLangMenuOpen); }}
@@ -398,12 +311,11 @@ function App() {
           </div>
         </div>
 
-        {/* Główne Menu - dodano box-sizing: border-box */}
+        {/* Główne Menu */}
         <nav style={{ padding: '20px 5vw', maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px', boxSizing: 'border-box' }} onClick={(e) => e.stopPropagation()}>
           
           <div className="nav-header-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 'auto' }}>
-            {/* NAPRAWA: Usunięto duży nagłówek "MedClinic Centrala" stąd, by nie dublować z HomePage i DoctorsList */}
-            <h1 onClick={() => navigate('home')} style={{cursor: 'pointer', margin: 0, fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-1px'}}>
+            <h1 onClick={() => handleNavigate('home')} style={{cursor: 'pointer', margin: 0, fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-1px'}}>
               {activeClinicData?.name || t.title}
             </h1>
             
@@ -415,9 +327,9 @@ function App() {
           <div className={`nav-links-container ${isMobileMenuOpen ? 'open' : ''}`} style={{display: 'flex', alignItems: 'center', gap: '40px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end'}}>
             
             <div className="nav-links-mobile" style={{display: 'flex', gap: '25px', alignItems: 'center', fontWeight: 700, fontSize: '0.95rem', color: '#475569'}}>
-              <span onClick={() => navigate('home')} style={{cursor: 'pointer', color: currentView === 'home' ? '#2563eb' : 'inherit', borderBottom: currentView === 'home' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navClinic}</span>
-              <span onClick={() => navigate('directory')} style={{cursor: 'pointer', color: currentView === 'directory' ? '#2563eb' : 'inherit', borderBottom: currentView === 'directory' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navOurDoctors}</span>
-              <button className="btn-book-mobile" onClick={() => navigate('list')} style={{cursor: 'pointer', color: 'white', background: '#2563eb', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.95rem'}}>{t.bookBtn}</button>
+              <span onClick={() => handleNavigate('home')} style={{cursor: 'pointer', color: currentView === 'home' ? '#2563eb' : 'inherit', borderBottom: currentView === 'home' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navClinic}</span>
+              <span onClick={() => handleNavigate('directory')} style={{cursor: 'pointer', color: currentView === 'directory' ? '#2563eb' : 'inherit', borderBottom: currentView === 'directory' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navOurDoctors}</span>
+              <button className="btn-book-mobile" onClick={() => handleNavigate('list')} style={{cursor: 'pointer', color: 'white', background: '#2563eb', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.95rem'}}>{t.bookBtn}</button>
             </div>
 
             <div className="navbar-user-mobile">
@@ -431,48 +343,48 @@ function App() {
                     <div className="dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, marginTop: '10px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', minWidth: '250px', zIndex: 100, overflow: 'hidden' }}>
                       {user.role === 'DOCTOR' && (
                         <>
-                            <div onClick={() => navigate('doctor-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>👨‍⚕️ Pilot Wizyt</div>
-                            <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Mój Grafik</div>
+                            <div onClick={() => handleNavigate('doctor-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>👨‍⚕️ Pilot Wizyt</div>
+                            <div onClick={() => handleNavigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Mój Grafik</div>
                         </>
                       )}
                       {user.role === 'RECEPTIONIST' && (
                         <>
-                            <div onClick={() => navigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
-                            <div onClick={() => navigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Radar Gabinetów</div>
-                            <div onClick={() => navigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Kartoteka Pacjentów</div>
-                            <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Grafik Pracy</div>
+                            <div onClick={() => handleNavigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
+                            <div onClick={() => handleNavigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Radar Gabinetów</div>
+                            <div onClick={() => handleNavigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Kartoteka Pacjentów</div>
+                            <div onClick={() => handleNavigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Grafik Pracy</div>
                         </>
                       )}
                       {(user.role === 'MANAGER' || user.role === 'ADMIN') && (
                         <>
                             <div style={{fontSize:'0.75rem', color:'#94a3b8', padding:'10px 20px', textTransform:'uppercase', fontWeight:'bold', background: '#f8fafc'}}>Zarządzanie</div>
-                            <div onClick={() => navigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
-                            <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Planowanie Grafiku</div>
-                            <div onClick={() => navigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Baza Pacjentów</div>
-                            <div onClick={() => navigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Podgląd Recepcji</div>
+                            <div onClick={() => handleNavigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
+                            <div onClick={() => handleNavigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Planowanie Grafiku</div>
+                            <div onClick={() => handleNavigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Baza Pacjentów</div>
+                            <div onClick={() => handleNavigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Podgląd Recepcji</div>
                             {user.role === 'ADMIN' && (
                               <>
-                                <div onClick={() => navigate('settings')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ Ustawienia Systemu</div>
-                                <div onClick={() => { window.history.pushState({}, '', '/tv'); navigate('tv-view'); }} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#2563eb', fontWeight: 'bold'}}>📺 Uruchom Ekran TV</div>
+                                <div onClick={() => handleNavigate('settings')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ Ustawienia Systemu</div>
+                                <div onClick={() => handleNavigate('tv-view')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#2563eb', fontWeight: 'bold'}}>📺 Uruchom Ekran TV</div>
                               </>
                             )}
                         </>
                       )}
                       {user.role === 'PATIENT' && (
                         <>
-                           <div onClick={() => navigate('list')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 {t.bookBtn}</div>
-                           <div onClick={() => navigate('my-appointments')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📋 {t.myAppointments}</div>
+                           <div onClick={() => handleNavigate('list')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 {t.bookBtn}</div>
+                           <div onClick={() => handleNavigate('my-appointments')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📋 {t.myAppointments}</div>
                         </>
                       )}
-                      <div onClick={() => navigate('profile')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ {t.navProfile}</div>
+                      <div onClick={() => handleNavigate('profile')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ {t.navProfile}</div>
                       <div onClick={handleLogout} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', color: '#dc2626', fontWeight: 'bold'}}>🚪 {t.logout}</div>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="login-buttons-mobile" style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
-                  <button onClick={() => navigate('check-guest')} className="btn-login-nav" style={{background: 'none', color: '#475569', border: 'none', fontWeight: 'bold', cursor: 'pointer'}}>🔍 {t.checkGuestBtn}</button>
-                  <button className="btn-logout" onClick={() => navigate('login')} style={{background: '#0f172a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'}}>{t.login}</button>
+                  <button onClick={() => handleNavigate('check-guest')} className="btn-login-nav" style={{background: 'none', color: '#475569', border: 'none', fontWeight: 'bold', cursor: 'pointer'}}>🔍 {t.checkGuestBtn}</button>
+                  <button className="btn-logout" onClick={() => handleNavigate('login')} style={{background: '#0f172a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'}}>{t.login}</button>
                 </div>
               )}
             </div>
@@ -480,7 +392,92 @@ function App() {
         </nav>
       </header>
 
-      <main className="main-content" style={{ flex: 1, boxSizing: 'border-box' }}>{renderContent()}</main>
+      <main className="main-content" style={{ flex: 1, boxSizing: 'border-box' }}>
+        {/* NOWOŚĆ: Blok definiujący, jaki komponent wyświetla się pod danym linkiem */}
+        <Routes>
+          <Route path="/" element={
+            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => { setSelectedClinicId(id); window.scrollTo(0, 0); }} />
+          } />
+          
+          <Route path="/nasi-lekarze" element={
+            <DoctorsDirectory lang={lang} doctors={clinicSpecificDoctors} onBookDirectly={(doc: Doctor, svc?: any) => { setPreselectedService(svc); setSelectedDoctor(doc); }} />
+          } />
+          
+          <Route path="/umow-wizyte" element={
+            <div style={{padding: '60px 5vw', maxWidth: '1440px', margin: 'auto', boxSizing: 'border-box', width: '100%'}}>
+              {loading ? <div style={{textAlign:'center', padding: '50px'}}>Wczytywanie lekarzy...</div> : (
+                <DoctorsList doctors={clinicSpecificDoctors} loading={loading} lang={lang} onBook={(doc) => { setPreselectedService(null); setSelectedDoctor(doc); }} />
+              )}
+            </div>
+          } />
+
+          <Route path="/logowanie" element={
+            <div className="auth-container" style={{padding: '80px 20px'}}>
+              <div className="auth-card" style={{margin: '0 auto'}}>
+                <LoginForm onLoginSuccess={handleLoginSuccess} />
+                <p style={{marginTop: '15px', textAlign: 'center'}}>
+                  Nie masz konta? <span onClick={() => handleNavigate('register')} style={{color: '#2563eb', cursor: 'pointer', fontWeight: 'bold'}}>Zarejestruj się</span>
+                </p>
+              </div>
+            </div>
+          } />
+
+          <Route path="/rejestracja" element={
+            <div className="auth-container" style={{padding: '80px 20px'}}>
+              <RegisterForm onSuccess={() => handleNavigate('login')} onSwitchToLogin={() => handleNavigate('login')} lang={lang} />
+            </div>
+          } />
+
+          <Route path="/moj-profil" element={
+            <div style={{padding: '50px 5vw'}}><UserProfile user={user} onUpdateUser={(updated: any) => setUser(updated)} lang={lang} /></div>
+          } />
+
+          <Route path="/panel-lekarza" element={
+            user?.role !== 'DOCTOR' ? <p style={{padding: '50px', textAlign: 'center'}}>Brak uprawnień.</p> : <DoctorDashboard />
+          } />
+
+          <Route path="/radar-gabinetow" element={
+            !['RECEPTIONIST', 'ADMIN', 'MANAGER'].includes(user?.role) ? <p style={{padding: '50px', textAlign: 'center'}}>Brak uprawnień recepcji.</p> : <ReceptionPanel user={user} onBookVisit={handleBookForPatient} />
+          } />
+
+          <Route path="/grafik" element={
+            !user ? <p style={{padding: '50px', textAlign: 'center'}}>Zaloguj się.</p> : <SchedulePanel userRole={user.role} userId={user.id} />
+          } />
+
+          <Route path="/kartoteka" element={
+            !['RECEPTIONIST', 'ADMIN', 'MANAGER'].includes(user?.role) ? <p style={{padding: '50px', textAlign: 'center'}}>Brak uprawnień.</p> : <PatientsRegistry onBookVisit={handleBookForPatient} />
+          } />
+
+          <Route path="/ustawienia" element={
+            user?.role !== 'ADMIN' ? <p style={{padding: '50px', textAlign: 'center'}}>Brak uprawnień.</p> : <AdminSettings onRefreshData={fetchDoctorsAndClinics} />
+          } />
+
+          <Route path="/wyszukaj-termin" element={
+            !['RECEPTIONIST', 'MANAGER', 'ADMIN'].includes(user?.role) ? <p style={{padding: '50px', textAlign: 'center'}}>Brak uprawnień.</p> : (
+              <QuickSearch doctors={clinicSpecificDoctors} onBook={(doc, svc, date, time) => { setPreselectedService(svc); setPreselectedDate(date); setPreselectedTime(time); setSelectedDoctor(doc); }} />
+            )
+          } />
+
+          <Route path="/sprawdz-wizyte" element={
+            <div style={{maxWidth: '800px', width: '95%', margin: '80px auto'}}>
+              <div style={{background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', textAlign: 'center', border: '1px solid #e2e8f0'}}>
+                <div style={{maxWidth: '500px', margin: '0 auto 30px auto'}}>
+                  <h2 style={{color: '#2563eb', marginBottom: '10px', fontSize: '2rem', fontWeight: 900}}>{t.checkGuestTitle}</h2>
+                  <form onSubmit={handleGuestCheckSubmit} style={{display: 'flex', gap:'10px'}}>
+                    <input type="text" placeholder={t.peselPlaceholder} value={guestPeselInput} onChange={(e) => setGuestPeselInput(e.target.value.replace(/\D/g, ''))} maxLength={11} style={{flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box'}}/>
+                    <button type="submit" className="btn-logout" style={{width: 'auto', padding: '0 20px', background: '#0f172a', color: 'white', border: 'none'}}>{t.searchBtn}</button>
+                  </form>
+                </div>
+                {activeGuestPesel && <div style={{textAlign: 'left', borderTop: '1px solid #e2e8f0', paddingTop: '20px'}}><MyAppointments lang={lang} guestPesel={activeGuestPesel} /></div>}
+              </div>
+            </div>
+          } />
+
+          <Route path="/moje-wizyty" element={
+            <div style={{padding: '50px 0'}}><MyAppointments lang={lang} /></div>
+          } />
+        </Routes>
+      </main>
 
       <footer style={{ background: '#020617', color: 'white', padding: '80px 5vw 30px 5vw', borderTop: '1px solid #1e293b', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: '1440px', margin: 'auto', width: '100%' }}>
@@ -491,9 +488,9 @@ function App() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '20px', color: '#60a5fa' }}>Nawigacja</h4>
-              <span onClick={() => navigate('home')} style={{ color: '#94a3b8', cursor: 'pointer', marginBottom: '10px' }}>{t.navClinic}</span>
-              <span onClick={() => navigate('directory')} style={{ color: '#94a3b8', cursor: 'pointer', marginBottom: '10px' }}>{t.navOurDoctors}</span>
-              <span onClick={() => navigate('list')} style={{ color: '#94a3b8', cursor: 'pointer', marginBottom: '10px' }}>{t.bookBtn}</span>
+              <span onClick={() => handleNavigate('home')} style={{ color: '#94a3b8', cursor: 'pointer', marginBottom: '10px' }}>{t.navClinic}</span>
+              <span onClick={() => handleNavigate('directory')} style={{ color: '#94a3b8', cursor: 'pointer', marginBottom: '10px' }}>{t.navOurDoctors}</span>
+              <span onClick={() => handleNavigate('list')} style={{ color: '#94a3b8', cursor: 'pointer', marginBottom: '10px' }}>{t.bookBtn}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '20px', color: '#60a5fa' }}>Kontakt</h4>
@@ -514,4 +511,11 @@ function App() {
   );
 }
 
-export default App;
+// OPAKOWANIE APLIKACJI W ROUTER (Niezbędne do działania URL)
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}
