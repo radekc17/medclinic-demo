@@ -141,7 +141,7 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
 
   // Widok konkretnej kliniki
   const mapQuery = encodeURIComponent(`${clinicData.name} ${clinicData.address}`);
-  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=TWOJ_KLUCZ_API_LUB_WSTAWCIE_IFRAME_SRC&q=${mapQuery}`;
+  const mapUrl = `https://maps.google.com/maps?q=${mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div style={{background: 'white', color: '#0f172a', fontFamily: '"Open Sauce", sans-serif'}}>
@@ -157,7 +157,7 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
         </div>
       </section>
 
-      {/* KLUCZOWA ZMIANA: Zdjęcie na mobile pójdzie na górę dzięki flex-direction w CSS */}
+      {/* KLUCZOWA ZMIANA: Zdjęcie na mobile pójdzie na górę dzięki flex-direction w App.css */}
       <section className="split-section" style={styles.splitSection}>
         <div className="split-text" style={styles.splitTextContent}>
           <h2 className="section-title-left" style={styles.sectionTitleLeft}>{c.servingTitle}<br/><span style={{color: '#2563eb'}}>2001</span>.</h2>
@@ -171,33 +171,47 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
         <span style={styles.offeringTag}>{c.offerTag}</span>
         <h2 className="section-title" style={styles.sectionTitleCenter}>{c.offerTitle} <br/><span style={{color: '#2563eb'}}>{c.offerHighlight}</span></h2>
         <div className="offering-grid" style={styles.offeringGrid}>
-          {offering.map((item, i) => (
-            <div 
-              key={i} 
-              style={{...styles.offeringCard, cursor: item.title === t.specCardio ? 'pointer' : 'default'}}
-              onClick={() => {
-                // EASTER EGG DLA KARDIOLOGA
-                if (item.title === t.specCardio) {
-                  window.open('https://music.youtube.com/watch?v=pIb7QoXdP_k', '_blank');
-                }
-              }}
-            >
-              <div style={styles.cardIcon}>
-                {item.title === t.specDentist ? '🦷' : 
-                 item.title === t.specPediatry ? '🧸' : 
-                 item.title === t.specNeuro ? '🧠' : '🩺'}
+          {offering.map((item, i) => {
+            // Sprawdzamy czy to kardiolog (ignorujemy wielkość liter i spacje)
+            const isCardio = item.title.toLowerCase().trim() === t.specCardio.toLowerCase().trim();
+
+            return (
+              <div 
+                key={i} 
+                style={{
+                  ...styles.offeringCard, 
+                  cursor: isCardio ? 'pointer' : 'default',
+                  transition: 'all 0.3s ease'
+                }}
+                onClick={() => {
+                  if (isCardio) {
+                    window.open('https://music.youtube.com/watch?v=pIb7QoXdP_k', '_blank');
+                  }
+                }}
+                onMouseOver={(e) => {
+                   if(isCardio) e.currentTarget.style.borderColor = '#2563eb';
+                }}
+                onMouseOut={(e) => {
+                   if(isCardio) e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+              >
+                <div style={styles.cardIcon}>
+                  {item.title.toLowerCase().includes('stom') ? '🦷' : 
+                   item.title.toLowerCase().includes('pedi') ? '🧸' : 
+                   item.title.toLowerCase().includes('neur') ? '🧠' : '🩺'}
+                </div>
+                <h3 style={styles.cardTitle}>{item.title}</h3>
+                <p style={styles.cardDesc}>{item.desc}</p>
               </div>
-              <h3 style={styles.cardTitle}>{item.title}</h3>
-              <p style={styles.cardDesc}>{item.desc}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
       <section className="footer-split" style={{display: 'flex', flexWrap: 'wrap', minHeight: '70vh'}}>
         <div className="map-container" style={{flex: 1, minWidth: '300px', background: '#e2e8f0'}}>
           <iframe 
-            src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`} 
+            src={mapUrl} 
             width="100%" 
             height="100%" 
             style={{border: 0, minHeight: '400px'}} 
