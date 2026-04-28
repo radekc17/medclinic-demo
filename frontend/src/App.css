@@ -1,8 +1,3 @@
-/* =========================================
-   GLOBALNY RESET & FIX NA TELEFONY
-   (Zabija poziomy pasek przewijania, 
-    naprawia szerokość białych boksów)
-========================================= */
 * {
   box-sizing: border-box;
 }
@@ -12,228 +7,160 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
+  background-color: #f8fafc; /* Bardzo jasne, przyjazne tło */
+  color: #0f172a;
 }
 
 /* =========================================
-   SPECYFICZNE STYLE PANELI (Recepcja/Lekarz)
+   NOWY, CZYSTY DESIGN (Kapsułkowe przyciski)
 ========================================= */
-.btn-chip {
-  flex: 1; 
-  padding: 8px; 
-  border: 1px solid #e2e8f0; 
-  background: white; 
-  border-radius: var(--radius); 
-  cursor: pointer; 
-  font-size: 0.85rem;
+
+.modern-link {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.modern-link:hover {
+  color: #2563eb !important;
+}
+
+.pill-btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+}
+.pill-btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.pill-btn-outline {
+  background: white;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pill-btn-outline:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.pill-btn-ghost {
+  background: transparent;
+  color: #475569;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pill-btn-ghost:hover {
+  color: #0f172a;
+}
+
+/* Okrągłe karty we wszystkich panelach */
+.auth-card, .doctor-card, .filters-bar {
+  border-radius: 24px !important;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.03) !important;
+  border: 1px solid #f1f5f9 !important;
+  background: white;
+}
+
+/* Rozwijane menu w stylu modern */
+.modern-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  min-width: 260px;
+  z-index: 100;
+  overflow: hidden;
+  padding: 10px;
+}
+.modern-menu-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-radius: 12px;
   transition: all 0.2s;
-  font-weight: 600; 
+  font-weight: 600;
   color: #475569;
 }
-
-.btn-chip:hover { 
-  border-color: var(--accent); 
-  color: var(--accent); 
-  background: #eff6ff; 
+.modern-menu-item:hover {
+  background: #f8fafc;
+  color: #0f172a;
 }
-
-.status-buttons-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+.menu-title {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  padding: 10px 20px;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
-
-.btn-status {
-  padding: 15px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: var(--radius);
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.btn-status span {
-  font-weight: 400;
-  font-size: 0.8rem;
-  color: #64748b;
-  margin-top: 4px;
-}
-
-.btn-status:hover { 
-  transform: translateY(-2px); 
-  box-shadow: var(--shadow-sm); 
-}
-
-/* Domyślnie ukrywamy przycisk hamburgera na PC */
-.hamburger-btn {
-  display: none !important;
-}
+.text-green { color: #16a34a !important; }
+.text-blue { color: #2563eb !important; }
+.text-red { color: #dc2626 !important; }
 
 
 /* =========================================
-   WIDOK MOBILNY (Ekrany do 768px)
+   SPECYFICZNE STYLE PANELI
+========================================= */
+.btn-chip { flex: 1; padding: 8px; border: 1px solid #e2e8f0; background: white; border-radius: 12px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; font-weight: 600; color: #475569; }
+.btn-chip:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+.status-buttons-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.btn-status { padding: 15px; border: 1px solid #e2e8f0; background: white; border-radius: 16px; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; font-weight: 700; color: #0f172a; }
+.btn-status span { font-weight: 500; font-size: 0.8rem; color: #64748b; margin-top: 4px; }
+.btn-status:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+.hamburger-btn { display: none !important; }
+
+/* =========================================
+   WIDOK MOBILNY
 ========================================= */
 @media (max-width: 768px) {
+  .top-bar-mobile { flex-direction: column !important; align-items: flex-start !important; }
+  .top-bar-info { flex-direction: column !important; align-items: flex-start !important; width: 100%; margin-bottom: 10px; }
+  .top-bar-flags { width: 100%; justify-content: flex-start !important; padding-left: 5px; }
+  .nav-header-mobile { width: 100% !important; }
+  .hamburger-btn { display: block !important; }
+  .nav-links-container { display: none !important; flex-direction: column !important; align-items: flex-start !important; width: 100% !important; gap: 20px !important; margin-top: 15px !important; padding-top: 15px !important; border-top: 1px solid #e2e8f0; box-sizing: border-box !important; }
+  .nav-links-container.open { display: flex !important; }
+  .nav-links-mobile { flex-direction: column !important; align-items: flex-start !important; width: 100%; gap: 15px !important; }
+  .btn-book-mobile { width: 100% !important; }
+  .navbar-user-mobile { width: 100% !important; }
+  .login-buttons-mobile { flex-direction: column !important; width: 100% !important; }
+  .pill-btn-outline, .pill-btn-ghost, .pill-btn-primary { width: 100% !important; margin-top: 5px !important; text-align: center !important; justify-content: center; }
+  .modern-dropdown { position: relative !important; width: 100% !important; box-shadow: none !important; border: none !important; padding-left: 10px !important; }
+  .hero-title { font-size: 2.8rem !important; }
+  .hero-subtitle { font-size: 1rem !important; padding: 0 10px; }
+  .section-title, .section-title-left { font-size: 2.2rem !important; margin-bottom: 30px !important; }
+  .split-section { flex-direction: column !important; }
+  .split-text { padding: 60px 20px !important; }
+  .split-img { min-height: 400px; }
+  .offering-section { padding: 60px 20px !important; }
+  .offering-grid { grid-template-columns: 1fr !important; }
+  .footer-split { flex-direction: column-reverse !important; }
+  .footer-content { padding: 60px 20px !important; }
+  .doctors-header h2 { font-size: 2rem !important; }
+  .filters-bar { flex-direction: column !important; align-items: stretch !important; padding: 15px !important; margin-bottom: 25px !important; box-sizing: border-box !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; }
+  .filter-input-wrapper { min-width: 100% !important; }
+  .doctors-grid { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; width: 100% !important; margin: 0 auto !important; gap: 20px !important; }
+  .doctor-card { width: min(100%, 350px) !important; margin: 0 auto !important; max-width: 100% !important; box-sizing: border-box !important; }
   
-  /* --- 1. GÓRNY PASEK I MENU (App.tsx) --- */
-  .top-bar-mobile {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-  }
-  .top-bar-info {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  /* Nowe menu flag dociągamy do lewej pod adresem, żeby nie wystawało */
-  .top-bar-flags {
-    width: 100%;
-    justify-content: flex-start !important;
-    padding-left: 5px; /* Minimalny padding dla estetyki */
-  }
-
-  .nav-header-mobile {
-    width: 100% !important;
-  }
-  .hamburger-btn {
-    display: block !important;
-  }
-
-  /* Rozwijane Menu - naprawa szerokości */
-  .nav-links-container {
-    display: none !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    gap: 20px !important;
-    margin-top: 15px !important;
-    padding-top: 15px !important;
-    border-top: 1px solid #e2e8f0;
-    box-sizing: border-box !important; /* Ważne, żeby padding nie rozpychał */
-  }
-  .nav-links-container.open {
-    display: flex !important;
-  }
-  .nav-links-mobile {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    width: 100%;
-    gap: 15px !important;
-  }
-  .btn-book-mobile {
-    width: 100% !important;
-  }
-  
-  /* Logowanie i User Menu */
-  .navbar-user-mobile {
-    width: 100% !important;
-  }
-  .login-buttons-mobile {
-    flex-direction: column !important;
-    width: 100% !important;
-  }
-  .btn-login-nav, .btn-logout, .btn-user-menu {
-    width: 100% !important;
-    margin-top: 5px !important;
-    text-align: center !important;
-  }
-  .btn-user-menu {
-    text-align: left !important;
-  }
-  .dropdown-menu {
-    position: relative !important;
-    width: 100% !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding-left: 10px !important;
-  }
-
-  /* --- 2. STRONA GŁÓWNA (HomePage.tsx) --- */
-  .hero-title {
-    font-size: 2.8rem !important;
-  }
-  .hero-subtitle {
-    font-size: 1rem !important;
-    padding: 0 10px;
-  }
-  .section-title, .section-title-left {
-    font-size: 2.2rem !important;
-    margin-bottom: 30px !important;
-  }
-  .split-section {
-    flex-direction: column !important; 
-  }
-  .split-text {
-    padding: 60px 20px !important;
-  }
-  .split-img {
-    min-height: 400px;
-  }
-  .offering-section {
-    padding: 60px 20px !important;
-  }
-  .offering-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .footer-split {
-    flex-direction: column-reverse !important; 
-  }
-  .footer-content {
-    padding: 60px 20px !important;
-  }
-
-  /* --- 3. LISTA LEKARZY (DoctorsList.tsx) --- */
-  .doctors-header h2 {
-    font-size: 2rem !important;
-  }
-  /* Naprawa overfllow w pasku filtrów */
-  .filters-bar {
-    flex-direction: column !important; 
-    align-items: stretch !important;
-    padding: 15px !important;
-    margin-bottom: 25px !important;
-    box-sizing: border-box !important;
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  .filter-input-wrapper {
-    min-width: 100% !important;
-  }
-  /* =========================================
-     NAPRAWA: Wyśrodkowanie kart lekarzy!
-     (Zmieniamy grid na flex column z centrowaniem)
-  ========================================= */
-  .doctors-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    gap: 20px !important;
-  }
-  /* Ustawiamy maksymalną szerokość karty na mobile, by buttony pasowały */
-  .doctor-card {
-    width: min(100%, 350px) !important;
-    margin: 0 auto !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-}/* --- 4. MODAL REZERWACJI (BookingModal.tsx) --- */
-  .booking-modal-grid {
-    grid-template-columns: 1fr !important; 
-  }
-  .booking-modal-left {
-    border-right: none !important;
-    border-bottom: 1px solid #f1f5f9 !important; 
-    padding: 15px !important;
-  }
-  .booking-modal-right {
-    padding: 15px !important;
-  }
+  /* Modal Rezerwacji */
+  .booking-modal-grid { grid-template-columns: 1fr !important; }
+  .booking-modal-left { border-right: none !important; border-bottom: 1px solid #f1f5f9 !important; padding: 15px !important; }
+  .booking-modal-right { padding: 15px !important; }
+}
