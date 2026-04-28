@@ -18,7 +18,6 @@ import { TvQueueView } from './components/TvQueueView';
 import { QuickSearch } from './components/QuickSearch';
 import { translations, type Language } from './translations';
 import { Toaster, toast } from 'react-hot-toast'; 
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 type View = 'home' | 'directory' | 'list' | 'login' | 'register' | 'my-appointments' | 'check-guest' | 'doctor-panel' | 'profile' | 'reception-panel' | 'schedule' | 'patients-registry' | 'settings' | 'tv-view' | 'quick-search';
 
@@ -66,7 +65,6 @@ function AppContent() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [prefilledPatient, setPrefilledPatient] = useState<any>(null);
 
-  // Zgadywanie aktualnego "widoku" na podstawie URL, żeby podświetlenia w menu działały jak dawniej
   const currentView = (Object.keys(viewToPath) as View[]).find(key => viewToPath[key] === location.pathname) || 'home';
 
   const handleCloseModal = () => {
@@ -118,7 +116,18 @@ function AppContent() {
     fetchDoctorsAndClinics();
   }, []);
 
-  // NOWA FUNKCJA NAWIGACJI - Zgodna z React Routerem
+  // NOWOŚĆ: Nasłuchiwanie adresu URL w poszukiwaniu ID kliniki
+  useEffect(() => {
+    // Jeśli adres to np. /klinika/1, wyciągamy jedynkę i ustawiamy jako aktywną klinikę
+    const match = location.pathname.match(/^\/klinika\/(\d+)/);
+    if (match) {
+      setSelectedClinicId(parseInt(match[1]));
+    } else if (location.pathname === '/') {
+      // Jeśli jesteśmy na samej stronie głównej, resetujemy na "Wszystkie placówki"
+      setSelectedClinicId(null);
+    }
+  }, [location.pathname]);
+
   const handleNavigate = (view: View) => {
     handleCloseModal(); 
     
@@ -187,7 +196,6 @@ function AppContent() {
     
   const canSwitchClinic = !user || ['ADMIN', 'MANAGER', 'PATIENT'].includes(user.role);
 
-  // SPECJALNY WIDOK DLA TV (Przejmuje cały ekran, omija resztę strony)
   if (location.pathname === viewToPath['tv-view']) {
       return (
           <div className="tv-mode-wrapper">
@@ -243,8 +251,11 @@ function AppContent() {
                     value={selectedClinicId || ''} 
                     onChange={(e) => {
                       const val = e.target.value;
-                      setSelectedClinicId(val ? parseInt(val) : null);
-                      handleNavigate('home');
+                      if (val) {
+                        navigateUrl(`/klinika/${val}`); // ZMIANA: Nawiguje do osobnego URL
+                      } else {
+                        navigateUrl('/'); // Wracamy do bazy
+                      }
                     }}
                     style={{ 
                       background: '#1e293b', 
@@ -394,12 +405,16 @@ function AppContent() {
       </header>
 
       <main className="main-content" style={{ flex: 1, boxSizing: 'border-box' }}>
-        {/* NOWOŚĆ: Blok definiujący, jaki komponent wyświetla się pod danym linkiem */}
         <Routes>
           <Route path="/" element={
-            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => { setSelectedClinicId(id); window.scrollTo(0, 0); }} />
+            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => { navigateUrl(`/klinika/${id}`); window.scrollTo(0, 0); }} />
           } />
           
+          {/* NOWOŚĆ: Dedykowany adres dla poszczególnej kliniki! */}
+          <Route path="/klinika/:clinicId" element={
+            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => { navigateUrl(`/klinika/${id}`); window.scrollTo(0, 0); }} />
+          } />
+
           <Route path="/nasi-lekarze" element={
             <DoctorsDirectory lang={lang} doctors={clinicSpecificDoctors} onBookDirectly={(doc: Doctor, svc?: any) => { setPreselectedService(svc); setSelectedDoctor(doc); }} />
           } />
