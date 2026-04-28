@@ -18,6 +18,7 @@ import { TvQueueView } from './components/TvQueueView';
 import { QuickSearch } from './components/QuickSearch';
 import { translations, type Language } from './translations';
 import { Toaster, toast } from 'react-hot-toast'; 
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 type View = 'home' | 'directory' | 'list' | 'login' | 'register' | 'my-appointments' | 'check-guest' | 'doctor-panel' | 'profile' | 'reception-panel' | 'schedule' | 'patients-registry' | 'settings' | 'tv-view' | 'quick-search';
 
