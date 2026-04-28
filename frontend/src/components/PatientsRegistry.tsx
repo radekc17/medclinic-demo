@@ -31,8 +31,8 @@ export function PatientsRegistry({ onBookVisit }: PatientsRegistryProps) {
     try {
       const token = localStorage.getItem('token');
       const url = searchTerm.length >= 3 
-        ? `http://localhost:3000/users/search-patients?q=${searchTerm}` 
-        : `http://localhost:3000/users/patients-all`;
+        ? `https://medclinic-demo.onrender.com/users/search-patients?q=${searchTerm}` 
+        : `https://medclinic-demo.onrender.com/users/patients-all`;
 
       const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -59,7 +59,7 @@ export function PatientsRegistry({ onBookVisit }: PatientsRegistryProps) {
     setLoadingAppts(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/appointments/guest-check`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/guest-check`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export function PatientsRegistry({ onBookVisit }: PatientsRegistryProps) {
     if (!window.confirm("Czy na pewno odwołać tę wizytę?")) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/appointments/guest-cancel/${appId}`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/guest-cancel/${appId}`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export function PatientsRegistry({ onBookVisit }: PatientsRegistryProps) {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/users', { 
+      const res = await fetch('https://medclinic-demo.onrender.com/users', { 
         method: 'POST', 
         headers: { 
           'Content-Type': 'application/json',

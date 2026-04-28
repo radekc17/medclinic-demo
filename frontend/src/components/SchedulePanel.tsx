@@ -135,8 +135,8 @@ export function SchedulePanel({ userRole, userId }: Props) {
   const fetchInitialConfig = async () => {
       try {
           const [meRes, clinRes] = await Promise.all([
-              fetch('http://localhost:3000/users/me', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }),
-              fetch('http://localhost:3000/clinics')
+              fetch('https://medclinic-demo.onrender.com/users/me', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }),
+              fetch('https://medclinic-demo.onrender.com/clinics')
           ]);
           if (meRes.ok) {
               const meData = await meRes.json();
@@ -156,7 +156,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
       const params = new URLSearchParams({ from: start.toISOString(), to: end.toISOString() });
       if (!isManager) params.append('userId', userId.toString());
 
-      const res = await fetch(`http://localhost:3000/schedule?${params.toString()}`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/schedule?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.ok) setShifts(await res.json());
@@ -166,7 +166,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
 
   const fetchPendingRequests = async () => {
       try {
-          const res = await fetch('http://localhost:3000/schedule/requests', {
+          const res = await fetch('https://medclinic-demo.onrender.com/schedule/requests', {
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           });
           if(res.ok) setPendingRequests(await res.json());
@@ -174,11 +174,11 @@ export function SchedulePanel({ userRole, userId }: Props) {
   };
 
   const fetchHelpers = async () => {
-      const uRes = await fetch('http://localhost:3000/users/staff', {
+      const uRes = await fetch('https://medclinic-demo.onrender.com/users/staff', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if(uRes.ok) setStaffList(await uRes.json());
-      const rRes = await fetch('http://localhost:3000/schedule/rooms');
+      const rRes = await fetch('https://medclinic-demo.onrender.com/schedule/rooms');
       if(rRes.ok) setRoomsList(await rRes.json());
   };
 
@@ -241,7 +241,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
       // SCENARIUSZ A: MANAGER WSTAWIA PRACĘ (Shift)
       if (isDirectPainting && showBulkModal === 'WORK') {
           try {
-             const res = await fetch('http://localhost:3000/schedule/shift/bulk', {
+             const res = await fetch('https://medclinic-demo.onrender.com/schedule/shift/bulk', {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                  body: JSON.stringify({
@@ -271,7 +271,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
           // SCENARIUSZ B: WNIOSEK / NIEOBECNOŚĆ (L4/URLOP)
           const typeToSend = showBulkModal === 'WORK' ? 'WORK_PREFERENCE' : absenceType;
           try {
-              const res = await fetch('http://localhost:3000/schedule/request/bulk', {
+              const res = await fetch('https://medclinic-demo.onrender.com/schedule/request/bulk', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                   body: JSON.stringify({
@@ -305,7 +305,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
 
   const handleQuickRoomChange = async (shift: WorkShift, newRoomId: string) => {
       try {
-          const res = await fetch('http://localhost:3000/schedule/shift', {
+          const res = await fetch('https://medclinic-demo.onrender.com/schedule/shift', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
               body: JSON.stringify({
@@ -328,7 +328,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
   const handleDeleteShift = async (shiftId: number) => {
       if (!window.confirm("Czy na pewno chcesz usunąć tę zmianę?")) return;
       try {
-          const res = await fetch(`http://localhost:3000/schedule/shift/${shiftId}`, {
+          const res = await fetch(`https://medclinic-demo.onrender.com/schedule/shift/${shiftId}`, {
               method: 'DELETE',
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           });
@@ -346,7 +346,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
       if (!showManualEdit) return;
       const form = e.target;
       try {
-          const res = await fetch('http://localhost:3000/schedule/shift', {
+          const res = await fetch('https://medclinic-demo.onrender.com/schedule/shift', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
               body: JSON.stringify({
@@ -376,7 +376,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
   const handleResolveAll = async () => {
       if (!window.confirm("Zatwierdzić WSZYSTKIE oczekujące wnioski?")) return;
       try {
-          const res = await fetch('http://localhost:3000/schedule/requests/resolve-all', {
+          const res = await fetch('https://medclinic-demo.onrender.com/schedule/requests/resolve-all', {
               method: 'POST',
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           });
@@ -391,7 +391,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
 
   const handleResolveRequest = async (id: number, status: 'APPROVED' | 'REJECTED') => {
       try {
-          const res = await fetch(`http://localhost:3000/schedule/requests/${id}/resolve`, {
+          const res = await fetch(`https://medclinic-demo.onrender.com/schedule/requests/${id}/resolve`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
               body: JSON.stringify({ status })
@@ -408,7 +408,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
     if (!window.confirm(`Wygenerować grafik na ${format(currentDate, 'MMMM', {locale: pl})}?`)) return;
     setLoading(true);
     try {
-        await fetch('http://localhost:3000/schedule/generate', {
+        await fetch('https://medclinic-demo.onrender.com/schedule/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
             body: JSON.stringify({ year: currentDate.getFullYear(), month: currentDate.getMonth() + 1 })
@@ -423,7 +423,7 @@ export function SchedulePanel({ userRole, userId }: Props) {
     if (draftIds.length === 0) return toast("Brak zmian do publikacji");
     if (!window.confirm(`Opublikować ${draftIds.length} zmian?`)) return;
     try {
-        await fetch('http://localhost:3000/schedule/publish', {
+        await fetch('https://medclinic-demo.onrender.com/schedule/publish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
             body: JSON.stringify({ ids: draftIds })

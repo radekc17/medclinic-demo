@@ -35,7 +35,7 @@ export function UserProfile({ user, lang, onUpdateUser }: Props) {
     if (!payload.password) delete payload.password;
 
     try {
-      const res = await fetch('http://localhost:3000/users/me', {
+      const res = await fetch('https://medclinic-demo.onrender.com/users/me', {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',

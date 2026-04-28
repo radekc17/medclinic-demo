@@ -16,7 +16,7 @@ export function ClinicPortal({ clinicId, lang, onBook, onBack }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/clinics/${clinicId}`)
+    fetch(`https://medclinic-demo.onrender.com/clinics/${clinicId}`)
       .then(res => res.json())
       .then(data => { setClinicData(data); setLoading(false); })
       .catch(() => toast.error('Błąd pobierania danych kliniki'));

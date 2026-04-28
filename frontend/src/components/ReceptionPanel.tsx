@@ -58,7 +58,7 @@ export function ReceptionPanel({ user, onBookVisit }: { user?: any; onBookVisit?
 
   const fetchData = async () => {
     try {
-      const res = await fetch('http://localhost:3000/doctors/reception-status', {
+      const res = await fetch('https://medclinic-demo.onrender.com/doctors/reception-status', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -75,7 +75,7 @@ export function ReceptionPanel({ user, onBookVisit }: { user?: any; onBookVisit?
     setModalTab('history');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/appointments/guest-check`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/guest-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ pesel })
@@ -94,7 +94,7 @@ export function ReceptionPanel({ user, onBookVisit }: { user?: any; onBookVisit?
       if (searchDate) params.append('date', searchDate);
       if (searchQuery) params.append('query', searchQuery);
 
-      const res = await fetch(`http://localhost:3000/appointments/reception-search?${params.toString()}`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/reception-search?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -110,7 +110,7 @@ export function ReceptionPanel({ user, onBookVisit }: { user?: any; onBookVisit?
   const manualConfirm = async (appId: number) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/appointments/${appId}/confirm`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/${appId}/confirm`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -123,7 +123,7 @@ export function ReceptionPanel({ user, onBookVisit }: { user?: any; onBookVisit?
   };
 
   const updateStatus = async (id: number, status: string) => {
-    await fetch(`http://localhost:3000/doctors/${id}/work-status`, {
+    await fetch(`https://medclinic-demo.onrender.com/doctors/${id}/work-status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       body: JSON.stringify({ status })
@@ -142,7 +142,7 @@ export function ReceptionPanel({ user, onBookVisit }: { user?: any; onBookVisit?
     
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/appointments/reception-cancel/${appId}`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/reception-cancel/${appId}`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });

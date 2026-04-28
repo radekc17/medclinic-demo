@@ -56,7 +56,7 @@ export function QuickSearch({ doctors, onBook }: QuickSearchProps) {
         const hasService = doc.services?.some((s: any) => s.id.toString() === selectedServiceId);
         if (!hasService) return;
 
-        const res = await fetch(`http://localhost:3000/doctors/${doc.id}/slots?date=${selectedDate}&serviceId=${selectedServiceId}`);
+        const res = await fetch(`https://medclinic-demo.onrender.com/doctors/${doc.id}/slots?date=${selectedDate}&serviceId=${selectedServiceId}`);
         if (res.ok) {
           const slots = await res.json();
           // Dodajemy znalezione godziny do głównej listy, przypisując do nich lekarza

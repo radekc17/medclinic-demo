@@ -26,7 +26,7 @@ export function TvQueueView() {
   useEffect(() => { activeCallsRef.current = activeCalls; }, [activeCalls]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/clinics')
+    fetch('https://medclinic-demo.onrender.com/clinics')
       .then(res => res.json())
       .then(data => setClinics(data))
       .catch(err => console.error("Błąd pobierania klinik dla TV:", err));
@@ -37,7 +37,7 @@ export function TvQueueView() {
 
   const loadClinicData = async (id: number) => {
     try {
-      const res = await fetch(`http://localhost:3000/clinics/${id}`);
+      const res = await fetch(`https://medclinic-demo.onrender.com/clinics/${id}`);
       const data = await res.json();
       setClinicName(data.name);
       validDoctorIds.current = data.doctors.map((d: any) => d.id); 
@@ -126,7 +126,7 @@ export function TvQueueView() {
 
   const markAsAbsent = async (appId: number) => {
     try {
-      await fetch(`http://localhost:3000/appointments/${appId}/status`, {
+      await fetch(`https://medclinic-demo.onrender.com/appointments/${appId}/status`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'ABSENT' })
       });
     } catch (e) { console.error(e); }
@@ -135,7 +135,7 @@ export function TvQueueView() {
   useEffect(() => {
     if (setupMode) return; 
 
-    const socket = io('http://localhost:3000', { transports: ['websocket'] });
+    const socket = io('https://medclinic-demo.onrender.com', { transports: ['websocket'] });
     socket.on('connect', () => socket.emit('join-room', 'tv-global'));
 
     socket.on('appointment_updated', (data: AppointmentUpdate) => {

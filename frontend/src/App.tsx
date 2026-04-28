@@ -53,8 +53,8 @@ function App() {
   const fetchDoctorsAndClinics = async () => {
     try {
       const [docsRes, clinicsRes] = await Promise.all([
-        fetch('http://localhost:3000/doctors'),
-        fetch('http://localhost:3000/clinics')
+        fetch('https://medclinic-demo.onrender.com/doctors'),
+        fetch('https://medclinic-demo.onrender.com/clinics')
       ]);
       const docsData = await docsRes.json();
       const clinicsData = await clinicsRes.json();
@@ -71,7 +71,7 @@ function App() {
   const loadUser = () => {
     const token = localStorage.getItem('token');
     if (token) {
-      fetch('http://localhost:3000/users/me', {
+      fetch('https://medclinic-demo.onrender.com/users/me', {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => res.ok ? res.json() : null)
@@ -99,7 +99,7 @@ function App() {
   const handleLoginSuccess = (userData: any, accessToken: string) => {
     localStorage.setItem('token', accessToken);
     
-    fetch('http://localhost:3000/users/me', {
+    fetch('https://medclinic-demo.onrender.com/users/me', {
       headers: { Authorization: `Bearer ${accessToken}` }
     })
     .then(res => res.ok ? res.json() : userData)

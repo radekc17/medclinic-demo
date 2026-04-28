@@ -21,12 +21,12 @@ export function DoctorDashboard() {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const userRes = await fetch('http://localhost:3000/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
+      const userRes = await fetch('https://medclinic-demo.onrender.com/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
       const userData = await userRes.json();
       setDr(userData.doctorProfile);
 
       const dateStr = format(currentDate, 'yyyy-MM-dd');
-      const appRes = await fetch(`http://localhost:3000/doctors/me/appointments?date=${dateStr}`, {
+      const appRes = await fetch(`https://medclinic-demo.onrender.com/doctors/me/appointments?date=${dateStr}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (appRes.ok) {
@@ -57,7 +57,7 @@ export function DoctorDashboard() {
   }, [appointments, currentDate]);
 
   const updateDr = async (payload: any) => {
-    await fetch(`http://localhost:3000/doctors/me/status`, {
+    await fetch(`https://medclinic-demo.onrender.com/doctors/me/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       body: JSON.stringify(payload)
@@ -74,7 +74,7 @@ export function DoctorDashboard() {
         }
     }
     try {
-        const res = await fetch(`http://localhost:3000/doctors/appointments/${id}/${action}`, {
+        const res = await fetch(`https://medclinic-demo.onrender.com/doctors/appointments/${id}/${action}`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         if (res.ok) {
@@ -88,7 +88,7 @@ export function DoctorDashboard() {
   const handleAbsent = async (id: number) => {
     if (!window.confirm('Czy na pewno chcesz oznaczyć pacjenta jako nieobecnego? Zdejmie to wezwanie z ekranu TV.')) return;
     try {
-      const res = await fetch(`http://localhost:3000/appointments/${id}/status`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: JSON.stringify({ status: 'ABSENT' }) 
@@ -105,7 +105,7 @@ export function DoctorDashboard() {
     setModalView('history');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/appointments/guest-check`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/appointments/guest-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ pesel })

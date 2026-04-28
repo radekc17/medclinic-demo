@@ -144,7 +144,7 @@ export function BookingModal({
     if (val.length >= 3) {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:3000/users/search-patients?q=${val}`, {
+        const res = await fetch(`https://medclinic-demo.onrender.com/users/search-patients?q=${val}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -185,7 +185,7 @@ export function BookingModal({
     try {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
-      const res = await fetch(`http://localhost:3000/doctors/${doctor.id}/month-availability?year=${year}&month=${month}`);
+      const res = await fetch(`https://medclinic-demo.onrender.com/doctors/${doctor.id}/month-availability?year=${year}&month=${month}`);
       if (res.ok) {
         const busy = await res.json();
         setBusyDates(busy);
@@ -201,7 +201,7 @@ export function BookingModal({
     setLoadingSlots(true);
     try {
       const dateString = format(date, 'yyyy-MM-dd');
-      const res = await fetch(`http://localhost:3000/doctors/${doctor.id}/slots?date=${dateString}&serviceId=${selectedService.id}`);
+      const res = await fetch(`https://medclinic-demo.onrender.com/doctors/${doctor.id}/slots?date=${dateString}&serviceId=${selectedService.id}`);
       const data = await res.json();
       setAvailableSlots(data);
     } catch (err) {
@@ -216,7 +216,7 @@ export function BookingModal({
     setSearchingNext(true);
     try {
       const dateString = format(selectedDate, 'yyyy-MM-dd');
-      const res = await fetch(`http://localhost:3000/doctors/${doctor.id}/next-available?date=${dateString}`);
+      const res = await fetch(`https://medclinic-demo.onrender.com/doctors/${doctor.id}/next-available?date=${dateString}`);
       const data = await res.json();
 
       if (data.availableDate) {
@@ -277,7 +277,7 @@ export function BookingModal({
     };
 
     try {
-      const response = await fetch('http://localhost:3000/appointments', {
+      const response = await fetch('https://medclinic-demo.onrender.com/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

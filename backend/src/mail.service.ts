@@ -62,7 +62,7 @@ export class MailService {
 
   // --- MAIL Z PRZYPOMNIENIEM (Wysyłany przez CRON 48h przed wizytą z linkiem weryfikacyjnym) ---
   async sendConfirmationEmail(to: string, patientName: string, appointmentId: number, dateStr: string, token: string) {
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = process.env.BACKEND_URL || 'https://medclinic-demo.onrender.com';
     const confirmLink = `${backendUrl}/appointments/confirm-link/${token}`;
 
     const mailOptions = {

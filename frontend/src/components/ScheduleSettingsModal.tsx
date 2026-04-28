@@ -58,7 +58,7 @@ export function ScheduleSettingsModal({ onClose }: Props) {
 
   const fetchRooms = async () => {
       try {
-          const res = await fetch('http://localhost:3000/rooms', {
+          const res = await fetch('https://medclinic-demo.onrender.com/rooms', {
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           });
           if (res.ok) setRooms(await res.json());
@@ -67,14 +67,14 @@ export function ScheduleSettingsModal({ onClose }: Props) {
 
   const fetchDoctors = async () => {
     try {
-        const res = await fetch('http://localhost:3000/doctors');
+        const res = await fetch('https://medclinic-demo.onrender.com/doctors');
         if (res.ok) setDoctors(await res.json());
     } catch(e) { console.error(e); }
   };
 
   const fetchTemplates = async (userId: number) => {
     try {
-        const res = await fetch(`http://localhost:3000/schedule-templates/user/${userId}`, {
+        const res = await fetch(`https://medclinic-demo.onrender.com/schedule-templates/user/${userId}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         if (res.ok) setTemplates(await res.json());
@@ -84,7 +84,7 @@ export function ScheduleSettingsModal({ onClose }: Props) {
   const handleAddRoom = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
-          const res = await fetch('http://localhost:3000/rooms', {
+          const res = await fetch('https://medclinic-demo.onrender.com/rooms', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
               body: JSON.stringify({ name: newRoomName, type: newRoomType, clinicId: 1 }) 
@@ -100,7 +100,7 @@ export function ScheduleSettingsModal({ onClose }: Props) {
   const handleDeleteRoom = async (id: number) => {
       if(!window.confirm('Usunąć ten gabinet?')) return;
       try {
-          const res = await fetch(`http://localhost:3000/rooms/${id}`, {
+          const res = await fetch(`https://medclinic-demo.onrender.com/rooms/${id}`, {
               method: 'DELETE',
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           });
@@ -112,7 +112,7 @@ export function ScheduleSettingsModal({ onClose }: Props) {
       e.preventDefault();
       if (!selectedDoctorId) return toast.error('Wybierz lekarza');
       try {
-          const res = await fetch('http://localhost:3000/schedule-templates', {
+          const res = await fetch('https://medclinic-demo.onrender.com/schedule-templates', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
               body: JSON.stringify({
@@ -134,7 +134,7 @@ export function ScheduleSettingsModal({ onClose }: Props) {
   const handleDeleteTemplate = async (id: number) => {
     if(!window.confirm('Usunąć ten szablon?')) return;
     try {
-        const res = await fetch(`http://localhost:3000/schedule-templates/${id}`, {
+        const res = await fetch(`https://medclinic-demo.onrender.com/schedule-templates/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });

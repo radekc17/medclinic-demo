@@ -29,9 +29,9 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
       const headers = { 'Authorization': `Bearer ${token}` };
 
       const [settingsRes, staffRes, clinicsRes] = await Promise.all([
-        fetch('http://localhost:3000/settings', { headers }),
-        fetch('http://localhost:3000/staff', { headers }),
-        fetch('http://localhost:3000/clinics')
+        fetch('https://medclinic-demo.onrender.com/settings', { headers }),
+        fetch('https://medclinic-demo.onrender.com/staff', { headers }),
+        fetch('https://medclinic-demo.onrender.com/clinics')
       ]);
 
       if (settingsRes.ok) setSettings(await settingsRes.json());
@@ -50,7 +50,7 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
   const handleSaveSettings = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/settings', {
+      const res = await fetch('https://medclinic-demo.onrender.com/settings', {
         method: 'PATCH', 
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
         body: JSON.stringify(settings)
@@ -64,7 +64,7 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/staff', {
+      const res = await fetch('https://medclinic-demo.onrender.com/staff', {
         method: 'POST', 
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
         body: JSON.stringify(newStaff)
@@ -88,7 +88,7 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
         ? (value === "" ? null : Number(value)) 
         : value;
 
-      const res = await fetch(`http://localhost:3000/staff/${id}`, {
+      const res = await fetch(`https://medclinic-demo.onrender.com/staff/${id}`, {
         method: 'PATCH', 
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
         body: JSON.stringify({ [field]: finalValue })
@@ -250,7 +250,7 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
           <button 
             onClick={async () => {
               try {
-                const res = await fetch('http://localhost:3000/system/debug/trigger-cron');
+                const res = await fetch('https://medclinic-demo.onrender.com/system/debug/trigger-cron');
                 if (res.ok) toast.success("🤖 Bot AI: Przetworzono wizyty (48h/24h)!");
               } catch (e) { toast.error("Błąd połączenia z robotem"); }
             }}
@@ -264,7 +264,7 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
           <button 
             onClick={async () => {
               try {
-                const res = await fetch('http://localhost:3000/system/debug/test-mail');
+                const res = await fetch('https://medclinic-demo.onrender.com/system/debug/test-mail');
                 if (res.ok) toast.success("📧 Wysłano maila startowego (Bez linku)!");
               } catch (e) { toast.error("Błąd bramki mailowej"); }
             }}
@@ -278,7 +278,7 @@ export function AdminSettings({ onRefreshData }: AdminSettingsProps) {
           <button 
             onClick={async () => {
               try {
-                const res = await fetch('http://localhost:3000/system/debug/test-mail-link');
+                const res = await fetch('https://medclinic-demo.onrender.com/system/debug/test-mail-link');
                 if (res.ok) toast.success("✅ Wysłano przypomnienie 48h (Z LINKIEM)!");
               } catch (e) { toast.error("Błąd bramki mailowej"); }
             }}

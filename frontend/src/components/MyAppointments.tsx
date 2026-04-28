@@ -32,7 +32,7 @@ export function MyAppointments({ lang, guestPesel }: Props) {
       let options = {};
 
       if (guestPesel) {
-        url = 'http://localhost:3000/appointments/guest-check';
+        url = 'https://medclinic-demo.onrender.com/appointments/guest-check';
         options = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ export function MyAppointments({ lang, guestPesel }: Props) {
       } else {
         const token = localStorage.getItem('token');
         if (!token) return;
-        url = 'http://localhost:3000/appointments/my';
+        url = 'https://medclinic-demo.onrender.com/appointments/my';
         options = {
           headers: { Authorization: `Bearer ${token}` }
         };
@@ -77,7 +77,7 @@ export function MyAppointments({ lang, guestPesel }: Props) {
 
       // LOGIKA ODWOŁYWANIA DLA GOŚCIA
       if (guestPesel) {
-        url = `http://localhost:3000/appointments/guest-cancel/${id}`;
+        url = `https://medclinic-demo.onrender.com/appointments/guest-cancel/${id}`;
         options = {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -87,7 +87,7 @@ export function MyAppointments({ lang, guestPesel }: Props) {
       // LOGIKA ODWOŁYWANIA DLA ZALOGOWANEGO
       else {
         const token = localStorage.getItem('token');
-        url = `http://localhost:3000/appointments/${id}/cancel`;
+        url = `https://medclinic-demo.onrender.com/appointments/${id}/cancel`;
         options = {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${token}` }
