@@ -379,7 +379,7 @@ export function BookingModal({
 
   return (
     <div style={styles.overlay}>
-      <div style={styles.modal}>
+      <div style={styles.modal} className="booking-modal-content">
         <div style={styles.header}>
           <div>
             <h3 style={{margin: 0, color: 'var(--text-main)'}}>{t.modalTitle}</h3>
@@ -455,7 +455,7 @@ export function BookingModal({
                   <div style={{fontSize: '2rem'}}>📅</div>
                   <p style={{margin: 0, fontWeight: 600, color: 'var(--text-main)'}}>Brak wolnych terminów.</p>
                   <button 
-                    onClick={handleFindNextAvailable}
+                    onClick={handleFindNextAvailable} 
                     disabled={searchingNext}
                     style={{...styles.primaryBtn, width: '100%'}}
                   >
