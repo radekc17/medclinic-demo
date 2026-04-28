@@ -127,7 +127,7 @@ export function BookingModal({
       fetchSlots(selectedDate);
       // Jeśli zmieniamy datę ręcznie z kalendarza, czyścimy wybrany czas
       if (!initialTime || selectedDate.toISOString().split('T')[0] !== initialDate) {
-          setSelectedTime(null);
+         setSelectedTime(null);
       }
     }
   }, [selectedDate, step, selectedService]);
@@ -391,8 +391,8 @@ export function BookingModal({
         {step === 0 ? (
           renderServiceSelection()
         ) : (
-          <div style={styles.contentGrid}>
-            <div style={styles.leftColumn}>
+          <div className="booking-modal-grid" style={styles.contentGrid}>
+            <div className="booking-modal-left" style={styles.leftColumn}>
               <button 
                 onClick={() => setStep(0)} 
                 style={{marginBottom: '15px', background: 'none', border: 'none', color: 'var(--text-sub)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem'}}
@@ -427,7 +427,7 @@ export function BookingModal({
               />
             </div>
 
-            <div style={styles.rightColumn}>
+            <div className="booking-modal-right" style={styles.rightColumn}>
               <h4 style={styles.subHeader}>
                 {format(selectedDate, 'dd.MM.yyyy')}
               </h4>

@@ -225,4 +225,15 @@ html, body {
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
-}
+}/* --- 4. MODAL REZERWACJI (BookingModal.tsx) --- */
+  .booking-modal-grid {
+    grid-template-columns: 1fr !important; 
+  }
+  .booking-modal-left {
+    border-right: none !important;
+    border-bottom: 1px solid #f1f5f9 !important; 
+    padding: 15px !important;
+  }
+  .booking-modal-right {
+    padding: 15px !important;
+  }
