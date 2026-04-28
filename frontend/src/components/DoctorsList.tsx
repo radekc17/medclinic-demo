@@ -35,7 +35,6 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
   const [filterSpec, setFilterSpec] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Rozszerzona mapa specjalizacji zgodna z Twoim seedem
   const getLocalizedSpec = (dbSpec: string) => {
     const lower = dbSpec.toLowerCase();
     if (lower.includes('kardio')) return t.specCardio || "Kardiolog";
@@ -98,24 +97,25 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
   }, [doctors, filterSpec, searchQuery]);
 
   return (
-    <div className="doctors-list-wrapper" style={{maxWidth: '1200px', margin: '0 auto', padding: '0 20px'}}>
+    <div className="doctors-list-wrapper" style={{maxWidth: '1200px', margin: '0 auto', padding: '0 20px', boxSizing: 'border-box', width: '100%'}}>
       
       <header className="doctors-header" style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
         <h2 style={{fontSize: '2.5rem', fontWeight: 900, color: '#0f172a', marginBottom: '10px'}}>{t.doctorsTitle}</h2>
         <p style={{fontSize: '1.1rem', color: '#64748b'}}>{t.subtitle}</p>
       </header>
 
-      {/* PASEK FILTRÓW */}
+      {/* PASEK FILTRÓW - NAPRAWIONY BOX-SIZING */}
       <div className="filters-bar" style={{
         background: 'white', padding: '25px', borderRadius: '16px', border: '1px solid #e2e8f0',
-        marginBottom: '40px', display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-end', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+        marginBottom: '40px', display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-end', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+        boxSizing: 'border-box', width: '100%'
       }}>
-        <div className="filter-input-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '250px'}}>
+        <div className="filter-input-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 'min(100%, 250px)'}}>
           <label style={{fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px'}}>{t.filterCat}</label>
           <select 
             value={filterSpec} 
             onChange={e => setFilterSpec(e.target.value)}
-            style={{padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '1rem', fontWeight: 600, outline: 'none'}}
+            style={{padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '1rem', fontWeight: 600, outline: 'none', boxSizing: 'border-box', width: '100%'}}
           >
             <option value="ALL">{t.optAll}</option>
             {specializations.map(rawSpec => (
@@ -124,14 +124,14 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
           </select>
         </div>
 
-        <div className="filter-input-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: '250px'}}>
+        <div className="filter-input-wrapper" style={{display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 'min(100%, 250px)'}}>
           <label style={{fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px'}}>Szukaj lekarza</label>
           <input 
             type="text" 
             placeholder="Wpisz nazwisko..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '1rem', fontWeight: 600, outline: 'none'}}
+            style={{padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '1rem', fontWeight: 600, outline: 'none', boxSizing: 'border-box', width: '100%'}}
           />
         </div>
       </div>
@@ -139,18 +139,18 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
       {loading ? (
         <div style={{ padding: '4rem', textAlign: 'center', color: '#64748b', fontWeight: 600 }}>Ładowanie listy specjalistów...</div>
       ) : processedDoctors.length === 0 ? (
-        <div style={{textAlign: 'center', padding: '60px', background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', color: '#64748b'}}>
+        <div style={{textAlign: 'center', padding: '60px', background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', color: '#64748b', boxSizing: 'border-box'}}>
           {t.noDoctors}
         </div>
       ) : (
-        <div className="doctors-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '30px'}}>
+        <div className="doctors-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px', boxSizing: 'border-box', width: '100%'}}>
           {processedDoctors.map((doctor) => (
             <div key={doctor.id} className="doctor-card" style={{
               background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '25px',
-              display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease-in-out', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)'
+              display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease-in-out', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', boxSizing: 'border-box'
             }}>
               <div style={{display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '20px'}}>
-                {/* ZDJĘCIE LEKARZA - Pobierane z bazy (seed) */}
+                {/* ZDJĘCIE LEKARZA */}
                 <div style={{
                   width: '85px', height: '85px', borderRadius: '20px', flexShrink: 0,
                   backgroundImage: `url("${doctor.photoUrl || '/receptionist_portrait.jpg'}")`,
@@ -172,7 +172,7 @@ export function DoctorsList({ doctors, loading, lang, onBook }: Props) {
                 onClick={() => onBook(doctor)} 
                 style={{
                   width: '100%', padding: '14px', background: '#0f172a', color: 'white', border: 'none',
-                  borderRadius: '12px', fontWeight: 800, fontSize: '0.95rem', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.5px'
+                  borderRadius: '12px', fontWeight: 800, fontSize: '0.95rem', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.5px', boxSizing: 'border-box'
                 }}
               >
                 {t.bookBtn}

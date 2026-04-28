@@ -40,7 +40,8 @@ function App() {
   const [guestPeselInput, setGuestPeselInput] = useState('');
   const [activeGuestPesel, setActiveGuestPesel] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Nowy stan dla menu mobilnego
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false); // <--- NOWY STAN DLA FLAG
   const [prefilledPatient, setPrefilledPatient] = useState<any>(null);
 
   const handleCloseModal = () => {
@@ -141,7 +142,7 @@ function App() {
 
     setCurrentView(view);
     setIsMenuOpen(false);
-    setIsMobileMenuOpen(false); // Zamyka hamburger menu po kliknięciu
+    setIsMobileMenuOpen(false); 
     window.scrollTo(0, 0); 
   };
 
@@ -247,7 +248,7 @@ function App() {
           <div style={{maxWidth: '500px', margin: '0 auto 30px auto'}}>
             <h2 style={{color: '#2563eb', marginBottom: '10px', fontSize: '2rem', fontWeight: 900}}>{t.checkGuestTitle}</h2>
             <form onSubmit={handleGuestCheckSubmit} style={{display: 'flex', gap:'10px'}}>
-              <input type="text" placeholder={t.peselPlaceholder} value={guestPeselInput} onChange={(e) => setGuestPeselInput(e.target.value.replace(/\D/g, ''))} maxLength={11} style={{flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none'}}/>
+              <input type="text" placeholder={t.peselPlaceholder} value={guestPeselInput} onChange={(e) => setGuestPeselInput(e.target.value.replace(/\D/g, ''))} maxLength={11} style={{flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box'}}/>
               <button type="submit" className="btn-logout" style={{width: 'auto', padding: '0 20px', background: '#0f172a', color: 'white', border: 'none'}}>{t.searchBtn}</button>
             </form>
           </div>
@@ -258,12 +259,9 @@ function App() {
 
     if (currentView === 'my-appointments') return <div style={{padding: '50px 0'}}><MyAppointments lang={lang} /></div>;
 
+    // NAPRAWA: Usunąłem zdublowany nagłówek, który wchodził na ten z pliku DoctorsList!
     return (
-      <div style={{padding: '60px 5vw', maxWidth: '1440px', margin: 'auto'}}>
-        <header style={{ marginBottom: '2rem' }}>
-          <h2 className="page-title" style={{fontSize: '2.5rem', fontWeight: 900, color: '#0f172a'}}>{t.doctorsTitle} {activeClinicData ? `- ${activeClinicData.name}` : ''}</h2>
-          <p className="page-subtitle" style={{color: '#475569'}}>{t.subtitle}</p>
-        </header>
+      <div style={{padding: '60px 5vw', maxWidth: '1440px', margin: 'auto', boxSizing: 'border-box'}}>
         {loading ? <div style={{textAlign:'center', padding: '50px'}}>Wczytywanie lekarzy...</div> : (
           <DoctorsList doctors={clinicSpecificDoctors} loading={loading} lang={lang} onBook={(doc) => { setPreselectedService(null); setSelectedDoctor(doc); }} />
         )}
@@ -289,8 +287,9 @@ function App() {
       );
   }
 
+  // Upewniamy się, że kliknięcie gdziekolwiek zamyka menu
   return (
-    <div className="app-container" onClick={() => { setIsMenuOpen(false); setIsMobileMenuOpen(false); }} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif'}}> 
+    <div className="app-container" onClick={() => { setIsMenuOpen(false); setIsMobileMenuOpen(false); setIsLangMenuOpen(false); }} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif', width: '100%', overflowX: 'hidden'}}> 
       <Toaster position="top-center" />
       
       {selectedDoctor && (
@@ -342,7 +341,8 @@ function App() {
                       outline: 'none',
                       padding: '6px 12px', 
                       borderRadius: '8px', 
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      boxSizing: 'border-box'
                     }}
                   >
                     <option value="" style={{ background: '#0f172a', color: 'white', padding: '10px' }}>
@@ -359,16 +359,41 @@ function App() {
               )}
             </div>
 
-            <div className="top-bar-flags" style={{display: 'flex', gap: '15px', cursor: 'pointer', fontWeight: 'bold', alignItems: 'center'}}>
-              <span onClick={() => setLang('PL')} style={{opacity: lang === 'PL' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
-              <img src="https://flagcdn.com/w20/pl.png" alt="PL" style={{width: '20px', borderRadius: '2px'}} /> PL
-              </span>
-              <span onClick={() => setLang('EN')} style={{opacity: lang === 'EN' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
-              <img src="https://flagcdn.com/w20/gb.png" alt="EN" style={{width: '20px', borderRadius: '2px'}} /> EN
-              </span>
-              <span onClick={() => setLang('UA')} style={{opacity: lang === 'UA' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
-              <img src="https://flagcdn.com/w20/ua.png" alt="UA" style={{width: '20px', borderRadius: '2px'}} /> UA
-              </span>
+            {/* NOWE, CZYSTE MENU JĘZYKÓW (1 KLIK) */}
+            <div className="top-bar-flags" style={{position: 'relative'}}>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsLangMenuOpen(!isLangMenuOpen); }}
+                style={{
+                  background: '#1e293b', border: '1px solid #334155', color: 'white', padding: '6px 12px', 
+                  borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', 
+                  fontWeight: 'bold', fontSize: '0.85rem'
+                }}
+              >
+                <img src={`https://flagcdn.com/w20/${lang === 'EN' ? 'gb' : lang === 'UA' ? 'ua' : 'pl'}.png`} alt={lang} style={{width: '20px', borderRadius: '2px'}} /> 
+                {lang} ▾
+              </button>
+              
+              {isLangMenuOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: '#1e293b', 
+                  border: '1px solid #334155', borderRadius: '8px', overflow: 'hidden', zIndex: 1000, 
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.3)', minWidth: '100px'
+                }}>
+                  {(['PL', 'EN', 'UA'] as Language[]).map(l => (
+                    <div 
+                      key={l}
+                      onClick={() => { setLang(l); setIsLangMenuOpen(false); }}
+                      style={{
+                        padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', 
+                        background: lang === l ? '#334155' : 'transparent', borderBottom: '1px solid #0f172a'
+                      }}
+                    >
+                      <img src={`https://flagcdn.com/w20/${l === 'EN' ? 'gb' : l === 'UA' ? 'ua' : 'pl'}.png`} alt={l} style={{width: '20px', borderRadius: '2px'}} /> 
+                      <span style={{fontWeight: lang === l ? 'bold' : 'normal', color: 'white'}}>{l}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -381,7 +406,6 @@ function App() {
               {activeClinicData?.name || t.title}
             </h1>
             
-            {/* Przycisk Hamburgera (ukryty na PC, widoczny na Tel) */}
             <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', fontSize: '1.8rem', cursor: 'pointer', color: '#0f172a' }}>
               {isMobileMenuOpen ? '✕' : '☰'}
             </button>
@@ -455,9 +479,9 @@ function App() {
         </nav>
       </header>
 
-      <main className="main-content" style={{ flex: 1 }}>{renderContent()}</main>
+      <main className="main-content" style={{ flex: 1, boxSizing: 'border-box' }}>{renderContent()}</main>
 
-      <footer style={{ background: '#020617', color: 'white', padding: '80px 5vw 30px 5vw', borderTop: '1px solid #1e293b' }}>
+      <footer style={{ background: '#020617', color: 'white', padding: '80px 5vw 30px 5vw', borderTop: '1px solid #1e293b', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: '1440px', margin: 'auto', width: '100%' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '50px' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>

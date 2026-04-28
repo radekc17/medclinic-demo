@@ -1,11 +1,39 @@
-/* Zostawiamy TYLKO specyficzne style dla paneli (recepcja/lekarz), resztę załatwia index.css */
-
-.btn-chip {
-  flex: 1; padding: 8px; border: 1px solid #e2e8f0; background: white; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem;
-  transition: all 0.2s;
-  font-weight: 600; color: #475569;
+/* =========================================
+   GLOBALNY RESET & FIX NA TELEFONY
+   (Zabija poziomy pasek przewijania)
+========================================= */
+* {
+  box-sizing: border-box;
 }
-.btn-chip:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================================
+   SPECYFICZNE STYLE PANELI (Recepcja/Lekarz)
+========================================= */
+.btn-chip {
+  flex: 1; 
+  padding: 8px; 
+  border: 1px solid #e2e8f0; 
+  background: white; 
+  border-radius: var(--radius); 
+  cursor: pointer; 
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  font-weight: 600; 
+  color: #475569;
+}
+
+.btn-chip:hover { 
+  border-color: var(--accent); 
+  color: var(--accent); 
+  background: #eff6ff; 
+}
 
 .status-buttons-grid {
   display: grid;
@@ -34,15 +62,23 @@
   margin-top: 4px;
 }
 
-.btn-status:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-/* --- WIDOK MOBILNY - APP.TSX --- */
+.btn-status:hover { 
+  transform: translateY(-2px); 
+  box-shadow: var(--shadow-sm); 
+}
+
 /* Domyślnie ukrywamy przycisk hamburgera na PC */
 .hamburger-btn {
   display: none !important;
 }
 
+
+/* =========================================
+   WIDOK MOBILNY (Ekrany do 768px)
+========================================= */
 @media (max-width: 768px) {
-  /* Górny czarny pasek */
+  
+  /* --- 1. GÓRNY PASEK I MENU (App.tsx) --- */
   .top-bar-mobile {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -55,10 +91,9 @@
   }
   .top-bar-flags {
     width: 100%;
-    justify-content: flex-start !important; /* Flagi do lewej pod adresem */
+    justify-content: flex-start !important;
   }
 
-  /* Hamburger Menu */
   .nav-header-mobile {
     width: 100% !important;
   }
@@ -66,7 +101,7 @@
     display: block !important;
   }
 
-  /* Ukrywanie i pokazywanie linków */
+  /* Rozwijane Menu */
   .nav-links-container {
     display: none !important;
     flex-direction: column !important;
@@ -80,8 +115,6 @@
   .nav-links-container.open {
     display: flex !important;
   }
-
-  /* Układ linków w pionie */
   .nav-links-mobile {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -92,7 +125,7 @@
     width: 100% !important;
   }
   
-  /* Układ przycisków logowania w pionie */
+  /* Logowanie i User Menu */
   .navbar-user-mobile {
     width: 100% !important;
   }
@@ -108,12 +141,62 @@
   .btn-user-menu {
     text-align: left !important;
   }
-  /* Rozwijane menu usera nie zachodzi na ekran */
   .dropdown-menu {
     position: relative !important;
     width: 100% !important;
     box-shadow: none !important;
     border: none !important;
     padding-left: 10px !important;
+  }
+
+  /* --- 2. STRONA GŁÓWNA (HomePage.tsx) --- */
+  .hero-title {
+    font-size: 2.8rem !important;
+  }
+  .hero-subtitle {
+    font-size: 1rem !important;
+    padding: 0 10px;
+  }
+  .section-title, .section-title-left {
+    font-size: 2.2rem !important;
+    margin-bottom: 30px !important;
+  }
+  .split-section {
+    flex-direction: column !important; 
+  }
+  .split-text {
+    padding: 60px 20px !important;
+  }
+  .split-img {
+    min-height: 400px;
+  }
+  .offering-section {
+    padding: 60px 20px !important;
+  }
+  .offering-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .footer-split {
+    flex-direction: column-reverse !important; 
+  }
+  .footer-content {
+    padding: 60px 20px !important;
+  }
+
+  /* --- 3. LISTA LEKARZY (DoctorsList.tsx) --- */
+  .doctors-header h2 {
+    font-size: 2rem !important;
+  }
+  .filters-bar {
+    flex-direction: column !important; 
+    align-items: stretch !important;
+    padding: 15px !important;
+    margin-bottom: 25px !important;
+  }
+  .filter-input-wrapper {
+    min-width: 100% !important;
+  }
+  .doctors-grid {
+    grid-template-columns: 1fr !important; 
   }
 }
