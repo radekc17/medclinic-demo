@@ -127,7 +127,7 @@ export function BookingModal({
       fetchSlots(selectedDate);
       // Jeśli zmieniamy datę ręcznie z kalendarza, czyścimy wybrany czas
       if (!initialTime || selectedDate.toISOString().split('T')[0] !== initialDate) {
-         setSelectedTime(null);
+          setSelectedTime(null);
       }
     }
   }, [selectedDate, step, selectedService]);
