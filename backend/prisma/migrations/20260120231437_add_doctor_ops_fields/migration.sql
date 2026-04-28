@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Doctor" ADD COLUMN     "currentDelay" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "isOnBreak" BOOLEAN NOT NULL DEFAULT false;

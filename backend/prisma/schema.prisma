@@ -1,0 +1,269 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- DEFINICJA RÓL ---
+enum Role {
+  PATIENT
+  DOCTOR
+  RECEPTIONIST
+  ADMIN
+  MANAGER // Osoba od grafików (Kadrowa/Szefowa Recepcji)
+}
+
+// --- GŁÓWNY UŻYTKOWNIK ---
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  pesel     String?  @unique
+  role      Role     @default(PATIENT)
+  createdAt DateTime @default(now())
+
+  // Przypisanie pracownika do placówki
+  clinicId  Int?
+  clinic    Clinic?  @relation(fields: [clinicId], references: [id])
+
+  // POWRÓT DO STAREJ NAZWY (żeby user.controller.ts przestał sypać błędami)
+  doctorProfile Doctor?
+  appointments  Appointment[]
+
+  // SYSTEM GRAFIKOWY I KADROWY
+  workSchedules     WorkSchedule[]
+  scheduleRequests  ScheduleRequest[]
+  workLogs          WorkLog[]
+  scheduleTemplates ScheduleTemplate[]
+}
+
+// --- MODELE MEDYCZNE ---
+
+model Doctor {
+  id             Int      @id @default(autoincrement())
+  specialization String
+  photoUrl       String?
+  gapMinutes     Int      @default(5)
+
+  isOnBreak    Boolean @default(false)
+  currentDelay Int     @default(0)
+
+  workStatus String @default("AVAILABLE")
+
+  ruleMaxDailyPerPatient  Int @default(1)
+  ruleMinGapDays          Int @default(0)
+  ruleMaxFutureVisits     Int @default(3)
+
+  // Relacja do Usera - musi być dokładnie tak:
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  // Relacja do Kliniki (Twoja nowość)
+  clinicId Int?
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
+
+  availabilities Availability[]
+  appointments   Appointment[]
+  services       Service[]
+}
+
+model Service {
+  id       Int     @id @default(autoincrement())
+  name     String
+  price    Decimal
+  duration Int
+  isNfz    Boolean @default(false)
+
+  doctorId Int
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  appointments Appointment[]
+}
+
+model Availability {
+  id        Int    @id @default(autoincrement())
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  doctorId  Int
+  doctor    Doctor @relation(fields: [doctorId], references: [id])
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  status    String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  smsCode   String?
+
+  // --- NOWE POLA DLA POTWIERDZEŃ, KOLEJKI I WERYFIKACJI 2-ETAPOWEJ ---
+  isConfirmed         Boolean   @default(false)
+  confirmationSentAt  DateTime?
+  smsSent             Boolean   @default(false)
+  emailSent           Boolean   @default(false)   // NOWE: Czy wysłano maila
+  manualCheckRequired Boolean   @default(false)   // NOWE: Czy Halinka musi dzwonić (automat zawiódł)
+  lastContactAttempt  DateTime?                   // NOWE: Data ostatniej próby automatu
+  confirmationToken   String?   @unique           // <--- NAJNOWSZE: Unikalny token do kliknięcia w mailu
+  // ------------------------------------------------------------------
+
+  calledAt  DateTime?
+  startedAt DateTime?
+  endedAt   DateTime?
+
+  doctorId Int
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  patientId Int?
+  patient   User?  @relation(fields: [patientId], references: [id])
+
+  guestName  String?
+  guestEmail String?
+  guestPesel String?
+  guestPhone String?
+
+  serviceId Int?
+  service   Service? @relation(fields: [serviceId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Clinic {
+  id      Int    @id @default(autoincrement())
+  name    String
+  address String
+  phone   String
+  email   String
+
+  // NOWOŚĆ: Relacje odwrotne, by klinika "widziała" swoje gabinety i lekarzy
+  doctors Doctor[]
+  rooms   Room[]
+  users   User[]
+}
+
+// --- NOWOŚĆ: USTAWIENIA SYSTEMOWE (Z ROZSZERZENIEM O MODUŁ TV) ---
+model Settings {
+  id                   Int      @id @default(1)
+  longTermSmsHours     Int      @default(48)
+  shortTermSmsHours    Int      @default(2)
+  lastMinuteLimitHours Int      @default(2)
+  
+  // Opcja Admina do ignorowania 2-etapu przy dużym ruchu
+  skipManualVerification Boolean @default(false) 
+
+  // DODANO: Przełącznik dla Modułu Telewizora (TV Room View)
+  isTvModuleActive      Boolean @default(false) 
+  
+  updatedAt            DateTime @updatedAt
+}
+
+// --- SYSTEM GRAFIKOWY, KADROWY I ZASOBY ---
+
+model Room {
+  id       Int     @id @default(autoincrement())
+  name     String
+  type     String
+  isActive Boolean @default(true)
+
+  // NOWOŚĆ: Przypisanie gabinetu do konkretnej kliniki
+  clinicId Int?
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
+
+  schedules WorkSchedule[]
+  templates ScheduleTemplate[]
+}
+
+model ScheduleTemplate {
+  id      Int  @id @default(autoincrement())
+  userId  Int
+  user    User @relation(fields: [userId], references: [id])
+
+  dayOfWeek Int
+  startTime String
+  endTime   String
+
+  roomId Int?
+  room   Room? @relation(fields: [roomId], references: [id])
+
+  validFrom DateTime
+  validTo   DateTime?
+}
+
+model WorkSchedule {
+  id      Int  @id @default(autoincrement())
+  userId  Int
+  user    User @relation(fields: [userId], references: [id])
+
+  roomId Int?
+  room   Room? @relation(fields: [roomId], references: [id])
+
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime
+
+  type   ShiftType      @default(WORK)
+  status ScheduleStatus @default(DRAFT)
+
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ShiftType {
+  WORK
+  OVERTIME
+  ON_CALL
+  TRAINING
+}
+
+enum ScheduleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model ScheduleRequest {
+  id      Int  @id @default(autoincrement())
+  userId  Int
+  user    User @relation(fields: [userId], references: [id])
+
+  type      AbsenceType
+  startDate DateTime
+  endDate   DateTime
+
+  status RequestStatus @default(PENDING)
+
+  reason      String?
+  managerNote String?
+
+  createdAt DateTime @default(now())
+}
+
+enum AbsenceType {
+  VACATION
+  SICK_LEAVE
+  ON_DEMAND
+  UNPAID
+  WORK_PREFERENCE
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model WorkLog {
+  id      Int  @id @default(autoincrement())
+  userId  Int
+  user    User @relation(fields: [userId], references: [id])
+
+  checkIn  DateTime
+  checkOut DateTime?
+  systemDuration   Int?
+  approvedDuration Int?
+  date              DateTime @default(now())
+}

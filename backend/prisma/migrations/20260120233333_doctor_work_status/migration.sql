@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Doctor" ADD COLUMN     "workStatus" TEXT NOT NULL DEFAULT 'AVAILABLE';

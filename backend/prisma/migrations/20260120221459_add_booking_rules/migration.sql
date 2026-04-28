@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Doctor" ADD COLUMN     "ruleMaxDailyPerPatient" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN     "ruleMaxFutureVisits" INTEGER NOT NULL DEFAULT 3,
+ADD COLUMN     "ruleMinGapDays" INTEGER NOT NULL DEFAULT 0;

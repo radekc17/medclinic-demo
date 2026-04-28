@@ -1,0 +1,487 @@
+/* --- RESET I BAZA (NOWOCZESNA PALETA TRUST & CLEAN) --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #1e293b;       /* Głęboki granat - profesjonalizm */
+  --primary-hover: #334155;
+  --accent: #2563eb;        /* Szafirowy błękit akcji */
+  --bg-app: #f8fafc;        /* Jasne, czyste tło */
+  --bg-card: #ffffff;
+  --text-main: #111827;
+  --text-sub: #6b7280;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --radius: 8px;            /* Nowoczesne, subtelne zaokrąglenia */
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* --- NAVBAR --- */
+.navbar {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+}
+
+.navbar h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.025em;
+  cursor: pointer;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Biały przycisk (np. Sprawdź wizytę) */
+.btn-login-nav {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-main);
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-login-nav:hover {
+  background-color: #f9fafb;
+  border-color: var(--accent);
+}
+
+/* Niebieski przycisk akcji (np. Zaloguj) */
+.btn-logout {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: white !important;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* --- HAMBURGER MENU --- */
+.btn-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.hamburger-icon {
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hamburger-icon .line {
+  height: 2px;
+  background: #333;
+  width: 100%;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  width: 240px;
+  overflow: hidden;
+  border: 1px solid #f3f4f6;
+  z-index: 1001;
+}
+
+.menu-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #374151;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: #f9fafb;
+  color: var(--accent);
+}
+
+.menu-divider {
+  height: 1px;
+  background: #f3f4f6;
+  margin: 5px 0;
+}
+
+.logout-text {
+  color: #dc2626 !important;
+  font-weight: 600;
+}
+
+/* --- GŁÓWNY CONTENT I KARTY LEKARZY (PACJENT) --- */
+.main-content { padding: 2rem; max-width: 100%; }
+.doctors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+
+.doctor-card { 
+  background-color: var(--bg-card); 
+  border-radius: var(--radius); 
+  padding: 1.5rem; 
+  box-shadow: var(--shadow-md); 
+  border: 1px solid #e5e7eb; 
+  transition: transform 0.2s; 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.doctor-card:hover { 
+  transform: translateY(-4px); 
+  border-color: var(--accent); 
+}
+
+.card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+
+.avatar { 
+  width: 50px; height: 50px; 
+  background: linear-gradient(135deg, var(--accent), #60a5fa); 
+  border-radius: var(--radius); 
+  display: flex; align-items: center; justify-content: center; 
+  color: white; font-weight: 700; font-size: 1.25rem; 
+}
+
+.specialization { 
+  color: var(--accent); 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+}
+
+.btn-book { 
+  width: 100%; 
+  background-color: var(--accent); 
+  color: white; 
+  border: none; 
+  padding: 0.75rem; 
+  border-radius: var(--radius); 
+  font-weight: 600; 
+  cursor: pointer; 
+}
+
+/* --- AUTH CARD (LOGOWANIE/REJESTRACJA) --- */
+.auth-container { display: flex; justify-content: center; align-items: center; padding: 40px 20px; min-height: calc(100vh - 80px); }
+.auth-card { background: white; padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow-md); width: 100%; max-width: 500px; border: 1px solid #f3f4f6; }
+.form-group { margin-bottom: 20px; text-align: left; }
+.form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: var(--radius); font-size: 1rem; background-color: #f9fafb; }
+
+/* Przycisk logowania w formularzu */
+.btn-auth {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+.btn-auth:hover { background-color: var(--primary-hover); }
+
+/* --- KALENDARZ --- */
+.react-calendar { width: 100%; background: white; border: 1px solid #e2e8f0; border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+.react-calendar__tile--active { background: var(--accent) !important; color: white !important; border-radius: 4px; }
+.slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+.time-slot { padding: 8px; border: 1px solid #d1d5db; border-radius: var(--radius); text-align: center; cursor: pointer; background: white; font-weight: 600; }
+.time-slot.selected { background-color: var(--accent); color: white; }
+
+/* --- PANEL RECEPCJI (Style Radaru i Kart) --- */
+.reception-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.reception-header {
+  background: white; 
+  padding: 20px; 
+  border-radius: var(--radius); 
+  margin-bottom: 30px;
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #e2e8f0;
+}
+
+.reception-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 25px;
+}
+
+.reception-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.card-top { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-start; 
+  margin-bottom: 15px; 
+}
+
+/* Przycisk "Zębatka" ustawień na karcie lekarza */
+.btn-settings {
+  background: none; 
+  border: none; 
+  font-size: 1.2rem; 
+  cursor: pointer; 
+  opacity: 0.3; 
+  transition: 0.2s;
+}
+.btn-settings:hover { opacity: 1; transform: rotate(90deg); }
+
+/* Radar Statusu (Box kolorowy) */
+.live-status-box {
+  display: flex; 
+  align-items: center; 
+  gap: 15px;
+  padding: 15px;
+  border-radius: var(--radius);
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+.status-icon { font-size: 1.5rem; }
+.status-text { text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.85rem; }
+.status-sub { font-size: 0.7rem; font-weight: 400; opacity: 0.8; display: block; margin-top: 2px;}
+
+/* Stonowane kolory statusów */
+.live-status-box[style*="background-color: rgb(220, 252, 231)"] { 
+  background-color: #f0fdf4 !important; 
+  color: #166534 !important; 
+  border-color: #bbf7d0 !important; 
+}
+
+/* Alert opóźnienia */
+.delay-alert {
+  background: #fffbeb; 
+  color: #d97706; 
+  border: 1px solid #fcd34d;
+  padding: 8px; 
+  border-radius: var(--radius); 
+  font-size: 0.8rem; 
+  margin-bottom: 15px; 
+  text-align: center;
+}
+
+/* Lista wizyt w panelu recepcji */
+.appointments-mini-list {
+  background: #f8fafc;
+  border-radius: var(--radius);
+  padding: 15px;
+  margin-bottom: 20px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #f1f5f9;
+}
+
+.list-title {
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  color: var(--text-sub); 
+  margin-bottom: 10px; 
+  text-transform: uppercase;
+}
+
+.app-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+.app-time { font-weight: 800; color: var(--accent); width: 50px; }
+.app-patient { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.app-badge {
+  font-size: 0.65rem;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.clickable { cursor: pointer; transition: background 0.2s; }
+.clickable:hover { background: #e0f2fe; }
+
+/* Aktywny wiersz w liście (aktualna wizyta) */
+.active-row {
+  background-color: #eff6ff !important;
+  border-left: 3px solid #2563eb;
+}
+
+.no-apps { font-size: 0.85rem; color: #9ca3af; text-align: center; padding: 10px; font-style: italic; }
+
+/* --- MODALE (Używane przez Recepcję i Dashboard Lekarza) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.sharp-card {
+  background: white;
+  padding: 30px;
+  border-radius: var(--radius);
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e2e8f0;
+}
+
+.modal-header {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 20px;
+}
+
+.btn-close {
+  background: none; 
+  border: none; 
+  font-size: 1.5rem; 
+  cursor: pointer;
+  color: #64748b;
+}
+
+.info-grid p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.highlight-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 800;
+  color: var(--accent);
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Przyciski w modalu zarządzania */
+.section-label {
+  font-size: 0.7rem; font-weight: 800; color: #94a3b8; margin: 20px 0 10px 0; letter-spacing: 1px;
+}
+
+.btn-chip {
+  flex: 1; padding: 8px; border: 1px solid #e2e8f0; background: white; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem;
+  transition: all 0.2s;
+  font-weight: 600; color: #475569;
+}
+.btn-chip:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+
+.status-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.btn-status {
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: var(--radius);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.btn-status span {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.btn-status:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-color: var(--accent); }
+
+/* Kolory aktywnych przycisków statusu */
+.btn-status.available.active { border-color: #10b981; background: #ecfdf5; color: #047857; }
+.btn-status.internal.active { border-color: var(--accent); background: #eff6ff; color: #1d4ed8; }
+.btn-status.break.active { border-color: #64748b; background: #f1f5f9; color: #334155; }
+
+.full-width { width: 100%; margin-top: 20px; }
+
+/* --- RWD (Responsywność) --- */
+@media (max-width: 768px) {
+  .reception-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .navbar {
+    padding: 1rem;
+  }
+}
