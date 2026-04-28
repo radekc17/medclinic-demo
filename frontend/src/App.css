@@ -1,6 +1,21 @@
 /* =========================================
-   GLOBALNY RESET & FIX NA TELEFONY
+   1. GLOBALNY RESET I ZMIENNE (MODERN)
 ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-light: #f8fafc;
+  --text-main: #0f172a;
+  --text-sub: #64748b;
+  --white: #ffffff;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --radius-pill: 50px;
+  --radius-card: 24px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,15 +25,85 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* =========================================
-   DOMYŚLNE STYLE (KOMPUTER / DESKTOP)
+   2. PRZYCISKI I LINKI (PILL DESIGN)
 ========================================= */
+.pill-btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 12px 28px;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 
-/* Modal Rezerwacji - Dwie kolumny obok siebie */
+.pill-btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.pill-btn-outline {
+  background: white;
+  color: var(--text-main);
+  border: 1px solid #cbd5e1;
+  padding: 10px 24px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pill-btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #f1f5f9;
+}
+
+.pill-btn-ghost {
+  background: transparent;
+  color: var(--text-sub);
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.pill-btn-ghost:hover {
+  color: var(--text-main);
+}
+
+.modern-link {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 700;
+}
+
+.modern-link:hover {
+  color: var(--primary) !important;
+}
+
+/* =========================================
+   3. UKŁAD MODALA REZERWACJI (PC - DESKTOP)
+========================================= */
+/* To wymusza dwie kolumny obok siebie na komputerze */
 .booking-modal-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
@@ -27,44 +112,49 @@ html, body {
 }
 
 .booking-modal-left {
-  padding: 25px;
+  padding: 40px;
   border-right: 1px solid #f1f5f9;
+  background: white;
 }
 
 .booking-modal-right {
-  padding: 25px;
-  background-color: #fcfcfc;
+  padding: 40px;
+  background-color: #fafafa;
 }
 
-/* Kapsułkowe przyciski i linki */
-.pill-btn-primary {
-  background: #2563eb;
-  color: white;
-  padding: 12px 28px;
-  border-radius: 50px;
-  border: none;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* Siatka godzin w modalu */
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.pill-btn-outline {
+.time-slot {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
   background: white;
-  color: #0f172a;
-  border: 1px solid #cbd5e1;
-  padding: 10px 24px;
-  border-radius: 50px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
   font-weight: 700;
-  cursor: pointer;
+  transition: 0.2s;
 }
 
-.modern-link {
-  cursor: pointer;
-  transition: all 0.2s;
+.time-slot:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
-.modern-link:hover { color: #2563eb; }
 
-/* Grid lekarzy na PC - 3 lub 4 w rzędzie */
+.time-slot.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* =========================================
+   4. KARTY I LISTA LEKARZY (PC)
+========================================= */
 .doctors-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
@@ -72,54 +162,114 @@ html, body {
   width: 100%;
 }
 
+.doctor-card, .auth-card, .filters-bar {
+  border-radius: var(--radius-card) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid #f1f5f9 !important;
+  background: white;
+  transition: transform 0.3s ease;
+}
+
+.doctor-card:hover {
+  transform: translateY(-5px);
+}
+
+/* =========================================
+   5. SPECYFICZNE STYLE PANELI I MENU
+========================================= */
+.btn-chip {
+  flex: 1; padding: 8px; border: 1px solid #e2e8f0; background: white; border-radius: 12px;
+  cursor: pointer; font-size: 0.85rem; transition: all 0.2s; font-weight: 600; color: #475569;
+}
+.btn-chip:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+
+.status-buttons-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+.btn-status {
+  padding: 15px; border: 1px solid #e2e8f0; background: white; border-radius: 16px;
+  text-align: left; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
+  font-weight: 700; color: var(--text-main);
+}
+.btn-status:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--primary); }
+
+.modern-dropdown {
+  position: absolute; top: 100%; right: 0; margin-top: 10px; background: white;
+  border: 1px solid #f1f5f9; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+  min-width: 260px; z-index: 100; overflow: hidden; padding: 10px;
+}
+
+.modern-menu-item {
+  padding: 12px 20px; cursor: pointer; border-radius: 12px; transition: all 0.2s;
+  font-weight: 600; color: var(--text-sub);
+}
+.modern-menu-item:hover { background: #f8fafc; color: var(--primary); }
+
 .hamburger-btn { display: none !important; }
 
 /* =========================================
-   WIDOK MOBILNY (Tylko dla telefonów < 768px)
+   6. WIDOK MOBILNY (TELEFONY < 768px)
 ========================================= */
 @media (max-width: 768px) {
   
-  /* Modal na telefonie - łamiemy na jedną kolumnę */
+  /* Modal - łamanie do pionu */
   .booking-modal-grid {
     grid-template-columns: 1fr !important;
   }
   .booking-modal-left {
     border-right: none !important;
     border-bottom: 1px solid #f1f5f9 !important;
-    padding: 15px !important;
+    padding: 20px !important;
   }
   .booking-modal-right {
-    padding: 15px !important;
+    padding: 20px !important;
   }
 
-  /* Lekarze na telefonie - jeden pod drugim, wyśrodkowani */
+  /* Lekarze - pionowo i wyśrodkowani */
   .doctors-grid {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    gap: 20px;
   }
   .doctor-card {
     width: 100% !important;
     max-width: 350px;
   }
 
-  /* Nawigacja mobilna */
+  /* Pasek górny i nawigacja */
   .top-bar-mobile { flex-direction: column !important; align-items: flex-start !important; }
-  .nav-header-mobile { width: 100% !important; }
-  .hamburger-btn { display: block !important; }
+  .top-bar-info { width: 100%; margin-bottom: 10px; }
+  
+  .nav-header-mobile { width: 100% !important; display: flex; justify-content: space-between; }
+  .hamburger-btn { display: block !important; cursor: pointer; font-size: 1.8rem; }
   
   .nav-links-container {
     display: none !important;
     flex-direction: column !important;
     width: 100% !important;
+    gap: 20px !important;
+    margin-top: 15px !important;
     padding: 20px;
+    background: white;
     border-top: 1px solid #e2e8f0;
   }
   .nav-links-container.open { display: flex !important; }
 
-  .pill-btn-outline, .pill-btn-primary {
+  /* Przyciski na całą szerokość ekranu telefonu */
+  .pill-btn-outline, .pill-btn-primary, .navbar-user-mobile {
     width: 100% !important;
-    text-align: center;
     margin-top: 10px;
   }
+
+  /* Teksty Hero */
+  .hero-title { font-size: 2.5rem !important; line-height: 1.2 !important; }
+  .section-title, .section-title-left { font-size: 2rem !important; }
+
+  /* Sekcje dzielone (tekst + obraz) */
+  .split-section { flex-direction: column !important; }
+  .split-text { padding: 40px 20px !important; }
+  .split-img { min-height: 300px; }
+  
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr !important; gap: 30px; }
 }
