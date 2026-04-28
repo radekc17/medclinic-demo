@@ -361,10 +361,16 @@ function App() {
               )}
             </div>
 
-            <div style={{display: 'flex', gap: '15px', cursor: 'pointer', fontWeight: 'bold'}}>
-              <span onClick={() => setLang('PL')} style={{opacity: lang === 'PL' ? 1 : 0.4}}>🇵🇱 PL</span>
-              <span onClick={() => setLang('EN')} style={{opacity: lang === 'EN' ? 1 : 0.4}}>🇬🇧 EN</span>
-              <span onClick={() => setLang('UA')} style={{opacity: lang === 'UA' ? 1 : 0.4}}>🇺🇦 UA</span>
+            <div style={{display: 'flex', gap: '15px', cursor: 'pointer', fontWeight: 'bold', alignItems: 'center'}}>
+              <span onClick={() => setLang('PL')} style={{opacity: lang === 'PL' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
+              <img src="https://flagcdn.com/w20/pl.png" alt="PL" style={{width: '20px', borderRadius: '2px'}} /> PL
+              </span>
+              <span onClick={() => setLang('EN')} style={{opacity: lang === 'EN' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
+              <img src="https://flagcdn.com/w20/gb.png" alt="EN" style={{width: '20px', borderRadius: '2px'}} /> EN
+              </span>
+              <span onClick={() => setLang('UA')} style={{opacity: lang === 'UA' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
+              <img src="https://flagcdn.com/w20/ua.png" alt="UA" style={{width: '20px', borderRadius: '2px'}} /> UA
+              </span>
             </div>
           </div>
         </div>
