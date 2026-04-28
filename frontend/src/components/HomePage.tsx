@@ -92,6 +92,7 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
     { title: t.specCardio, desc: t.descCardio },
   ];
 
+  // Widok wyboru kliniki (Strona główna bez wybranej placówki)
   if (!clinicData) {
     return (
       <div style={{background: 'white', color: '#0f172a', fontFamily: '"Open Sauce", sans-serif'}}>
@@ -138,8 +139,9 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
     );
   }
 
+  // Widok konkretnej kliniki
   const mapQuery = encodeURIComponent(`${clinicData.name} ${clinicData.address}`);
-  const mapUrl = `https://maps.google.com/maps?q=${mapQuery}&t=m&z=15&output=embed&iwloc=near`;
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=TWOJ_KLUCZ_API_LUB_WSTAWCIE_IFRAME_SRC&q=${mapQuery}`;
 
   return (
     <div style={{background: 'white', color: '#0f172a', fontFamily: '"Open Sauce", sans-serif'}}>
@@ -155,6 +157,7 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
         </div>
       </section>
 
+      {/* KLUCZOWA ZMIANA: Zdjęcie na mobile pójdzie na górę dzięki flex-direction w CSS */}
       <section className="split-section" style={styles.splitSection}>
         <div className="split-text" style={styles.splitTextContent}>
           <h2 className="section-title-left" style={styles.sectionTitleLeft}>{c.servingTitle}<br/><span style={{color: '#2563eb'}}>2001</span>.</h2>
@@ -169,8 +172,21 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
         <h2 className="section-title" style={styles.sectionTitleCenter}>{c.offerTitle} <br/><span style={{color: '#2563eb'}}>{c.offerHighlight}</span></h2>
         <div className="offering-grid" style={styles.offeringGrid}>
           {offering.map((item, i) => (
-            <div key={i} style={styles.offeringCard}>
-              <div style={styles.cardIcon}>🩺</div>
+            <div 
+              key={i} 
+              style={{...styles.offeringCard, cursor: item.title === t.specCardio ? 'pointer' : 'default'}}
+              onClick={() => {
+                // EASTER EGG DLA KARDIOLOGA
+                if (item.title === t.specCardio) {
+                  window.open('https://music.youtube.com/watch?v=pIb7QoXdP_k', '_blank');
+                }
+              }}
+            >
+              <div style={styles.cardIcon}>
+                {item.title === t.specDentist ? '🦷' : 
+                 item.title === t.specPediatry ? '🧸' : 
+                 item.title === t.specNeuro ? '🧠' : '🩺'}
+              </div>
               <h3 style={styles.cardTitle}>{item.title}</h3>
               <p style={styles.cardDesc}>{item.desc}</p>
             </div>
@@ -181,7 +197,7 @@ export function HomePage({ lang, onBookClick, clinicData, allClinics = [], onCli
       <section className="footer-split" style={{display: 'flex', flexWrap: 'wrap', minHeight: '70vh'}}>
         <div className="map-container" style={{flex: 1, minWidth: '300px', background: '#e2e8f0'}}>
           <iframe 
-            src={mapUrl} 
+            src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`} 
             width="100%" 
             height="100%" 
             style={{border: 0, minHeight: '400px'}} 
