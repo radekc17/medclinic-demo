@@ -40,9 +40,9 @@ function App() {
   const [guestPeselInput, setGuestPeselInput] = useState('');
   const [activeGuestPesel, setActiveGuestPesel] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Nowy stan dla menu mobilnego
   const [prefilledPatient, setPrefilledPatient] = useState<any>(null);
 
-  // --- NAPRAWA: Centralna funkcja zamykająca ---
   const handleCloseModal = () => {
     setSelectedDoctor(null);
     setPreselectedService(null);
@@ -128,20 +128,20 @@ function App() {
     localStorage.removeItem('token');
     navigate('home');
     setIsMenuOpen(false);
+    setIsMobileMenuOpen(false);
     toast.success('Wylogowano pomyślnie');
   };
 
-  // --- NAPRAWA: Navigate inteligentnie zarządza pamięcią ---
   const navigate = (view: View) => {
     handleCloseModal(); 
     
-    // Zapominamy o wybranym pacjencie TYLKO, gdy wychodzimy z procesu rezerwacji
     if (view !== 'list' && view !== 'directory') {
       setPrefilledPatient(null);
     }
 
     setCurrentView(view);
     setIsMenuOpen(false);
+    setIsMobileMenuOpen(false); // Zamyka hamburger menu po kliknięciu
     window.scrollTo(0, 0); 
   };
 
@@ -173,10 +173,9 @@ function App() {
         clinicData={activeClinicData} 
         allClinics={clinics} 
         onBookClick={() => navigate('list')} 
-        // ZMIANA: Przekazujemy funkcję do zmiany kliniki z widoku kafelków
         onClinicSelect={(id) => {
           setSelectedClinicId(id);
-          window.scrollTo(0, 0); // Przewiń na górę po wyborze
+          window.scrollTo(0, 0); 
         }} 
       />
     );
@@ -291,10 +290,9 @@ function App() {
   }
 
   return (
-    <div className="app-container" onClick={() => setIsMenuOpen(false)} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif'}}> 
+    <div className="app-container" onClick={() => { setIsMenuOpen(false); setIsMobileMenuOpen(false); }} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif'}}> 
       <Toaster position="top-center" />
       
-      {/* NAPRAWA: Spójne zamykanie w onSuccess i onClose */}
       {selectedDoctor && (
         <BookingModal 
           doctor={selectedDoctor} 
@@ -306,10 +304,9 @@ function App() {
           onClose={handleCloseModal}
           onSuccess={() => { 
             toast.success(t.success);
-            handleCloseModal(); // 1. Najpierw usuwamy doktora ze stanu (zamykamy modal)
-            setPrefilledPatient(null); // <--- DODANE: Czyścimy pacjenta po udanej rezerwacji
+            handleCloseModal(); 
+            setPrefilledPatient(null); 
             
-            // 2. Potem nawigujemy (używając setTimeout, żeby React przetworzył zamknięcie)
             setTimeout(() => {
               const isStaff = user && ['RECEPTIONIST', 'MANAGER', 'ADMIN'].includes(user.role);
               navigate(isStaff ? 'patients-registry' : 'my-appointments'); 
@@ -319,9 +316,10 @@ function App() {
       )}
 
       <header style={{ background: 'white', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 100 }}>
+        {/* Czarny pasek */}
         <div style={{ background: '#020617', padding: '10px 5vw', color: 'white', fontSize: '0.85rem' }}>
-          <div style={{ maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <div className="top-bar-mobile" style={{ maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="top-bar-info" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
               <span style={{color: '#94a3b8'}}>📞 Info: {activeClinicData?.phone || '+48 22 111 22 33'}</span>
               
               {canSwitchClinic && (
@@ -361,7 +359,7 @@ function App() {
               )}
             </div>
 
-            <div style={{display: 'flex', gap: '15px', cursor: 'pointer', fontWeight: 'bold', alignItems: 'center'}}>
+            <div className="top-bar-flags" style={{display: 'flex', gap: '15px', cursor: 'pointer', fontWeight: 'bold', alignItems: 'center'}}>
               <span onClick={() => setLang('PL')} style={{opacity: lang === 'PL' ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '4px'}}>
               <img src="https://flagcdn.com/w20/pl.png" alt="PL" style={{width: '20px', borderRadius: '2px'}} /> PL
               </span>
@@ -375,74 +373,84 @@ function App() {
           </div>
         </div>
 
+        {/* Główne Menu */}
         <nav style={{ padding: '20px 5vw', maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }} onClick={(e) => e.stopPropagation()}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '40px', flexWrap: 'wrap'}}>
+          
+          <div className="nav-header-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 'auto' }}>
             <h1 onClick={() => navigate('home')} style={{cursor: 'pointer', margin: 0, fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-1px'}}>
               {activeClinicData?.name || t.title}
             </h1>
             
-            <div style={{display: 'flex', gap: '25px', alignItems: 'center', fontWeight: 700, fontSize: '0.95rem', color: '#475569'}}>
-              <span onClick={() => navigate('home')} style={{cursor: 'pointer', color: currentView === 'home' ? '#2563eb' : 'inherit', borderBottom: currentView === 'home' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navClinic}</span>
-              <span onClick={() => navigate('directory')} style={{cursor: 'pointer', color: currentView === 'directory' ? '#2563eb' : 'inherit', borderBottom: currentView === 'directory' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navOurDoctors}</span>
-              <button onClick={() => navigate('list')} style={{cursor: 'pointer', color: 'white', background: '#2563eb', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.95rem'}}>{t.bookBtn}</button>
-            </div>
+            {/* Przycisk Hamburgera (ukryty na PC, widoczny na Tel) */}
+            <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', fontSize: '1.8rem', cursor: 'pointer', color: '#0f172a' }}>
+              {isMobileMenuOpen ? '✕' : '☰'}
+            </button>
           </div>
 
-          <div className="navbar-user">
-            {user ? (
-              <div style={{position: 'relative'}}>
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="btn-user-menu" style={{background: 'white', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'}}>
-                  👤 {user.name} ({user.role}) ▾
-                </button>
+          <div className={`nav-links-container ${isMobileMenuOpen ? 'open' : ''}`} style={{display: 'flex', alignItems: 'center', gap: '40px', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end'}}>
+            
+            <div className="nav-links-mobile" style={{display: 'flex', gap: '25px', alignItems: 'center', fontWeight: 700, fontSize: '0.95rem', color: '#475569'}}>
+              <span onClick={() => navigate('home')} style={{cursor: 'pointer', color: currentView === 'home' ? '#2563eb' : 'inherit', borderBottom: currentView === 'home' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navClinic}</span>
+              <span onClick={() => navigate('directory')} style={{cursor: 'pointer', color: currentView === 'directory' ? '#2563eb' : 'inherit', borderBottom: currentView === 'directory' ? '2px solid #2563eb' : 'none', paddingBottom: '4px'}}>{t.navOurDoctors}</span>
+              <button className="btn-book-mobile" onClick={() => navigate('list')} style={{cursor: 'pointer', color: 'white', background: '#2563eb', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.95rem'}}>{t.bookBtn}</button>
+            </div>
 
-                {isMenuOpen && (
-                  <div className="dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, marginTop: '10px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', minWidth: '250px', zIndex: 100, overflow: 'hidden' }}>
-                    {user.role === 'DOCTOR' && (
-                      <>
-                          <div onClick={() => navigate('doctor-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>👨‍⚕️ Pilot Wizyt</div>
-                          <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Mój Grafik</div>
-                      </>
-                    )}
-                    {user.role === 'RECEPTIONIST' && (
-                      <>
-                          <div onClick={() => navigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
-                          <div onClick={() => navigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Radar Gabinetów</div>
-                          <div onClick={() => navigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Kartoteka Pacjentów</div>
-                          <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Grafik Pracy</div>
-                      </>
-                    )}
-                    {(user.role === 'MANAGER' || user.role === 'ADMIN') && (
-                      <>
-                          <div style={{fontSize:'0.75rem', color:'#94a3b8', padding:'10px 20px', textTransform:'uppercase', fontWeight:'bold', background: '#f8fafc'}}>Zarządzanie</div>
-                          <div onClick={() => navigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
-                          <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Planowanie Grafiku</div>
-                          <div onClick={() => navigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Baza Pacjentów</div>
-                          <div onClick={() => navigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Podgląd Recepcji</div>
-                          {user.role === 'ADMIN' && (
-                            <>
-                              <div onClick={() => navigate('settings')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ Ustawienia Systemu</div>
-                              <div onClick={() => { window.history.pushState({}, '', '/tv'); navigate('tv-view'); }} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#2563eb', fontWeight: 'bold'}}>📺 Uruchom Ekran TV</div>
-                            </>
-                          )}
-                      </>
-                    )}
-                    {user.role === 'PATIENT' && (
-                      <>
-                         <div onClick={() => navigate('list')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 {t.bookBtn}</div>
-                         <div onClick={() => navigate('my-appointments')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📋 {t.myAppointments}</div>
-                      </>
-                    )}
-                    <div onClick={() => navigate('profile')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ {t.navProfile}</div>
-                    <div onClick={handleLogout} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', color: '#dc2626', fontWeight: 'bold'}}>🚪 {t.logout}</div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
-                <button onClick={() => navigate('check-guest')} className="btn-login-nav" style={{background: 'none', color: '#475569', border: 'none', fontWeight: 'bold', cursor: 'pointer'}}>🔍 {t.checkGuestBtn}</button>
-                <button className="btn-logout" onClick={() => navigate('login')} style={{background: '#0f172a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'}}>{t.login}</button>
-              </div>
-            )}
+            <div className="navbar-user-mobile">
+              {user ? (
+                <div style={{position: 'relative'}}>
+                  <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="btn-user-menu" style={{background: 'white', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'}}>
+                    👤 {user.name} ({user.role}) ▾
+                  </button>
+
+                  {isMenuOpen && (
+                    <div className="dropdown-menu" style={{ position: 'absolute', top: '100%', right: 0, marginTop: '10px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', minWidth: '250px', zIndex: 100, overflow: 'hidden' }}>
+                      {user.role === 'DOCTOR' && (
+                        <>
+                            <div onClick={() => navigate('doctor-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>👨‍⚕️ Pilot Wizyt</div>
+                            <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Mój Grafik</div>
+                        </>
+                      )}
+                      {user.role === 'RECEPTIONIST' && (
+                        <>
+                            <div onClick={() => navigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
+                            <div onClick={() => navigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Radar Gabinetów</div>
+                            <div onClick={() => navigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Kartoteka Pacjentów</div>
+                            <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Grafik Pracy</div>
+                        </>
+                      )}
+                      {(user.role === 'MANAGER' || user.role === 'ADMIN') && (
+                        <>
+                            <div style={{fontSize:'0.75rem', color:'#94a3b8', padding:'10px 20px', textTransform:'uppercase', fontWeight:'bold', background: '#f8fafc'}}>Zarządzanie</div>
+                            <div onClick={() => navigate('quick-search')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#16a34a', fontWeight: 'bold'}}>🔍 Wyszukaj Termin</div>
+                            <div onClick={() => navigate('schedule')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 Planowanie Grafiku</div>
+                            <div onClick={() => navigate('patients-registry')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🗂️ Baza Pacjentów</div>
+                            <div onClick={() => navigate('reception-panel')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>🏢 Podgląd Recepcji</div>
+                            {user.role === 'ADMIN' && (
+                              <>
+                                <div onClick={() => navigate('settings')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ Ustawienia Systemu</div>
+                                <div onClick={() => { window.history.pushState({}, '', '/tv'); navigate('tv-view'); }} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', color: '#2563eb', fontWeight: 'bold'}}>📺 Uruchom Ekran TV</div>
+                              </>
+                            )}
+                        </>
+                      )}
+                      {user.role === 'PATIENT' && (
+                        <>
+                           <div onClick={() => navigate('list')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📅 {t.bookBtn}</div>
+                           <div onClick={() => navigate('my-appointments')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>📋 {t.myAppointments}</div>
+                        </>
+                      )}
+                      <div onClick={() => navigate('profile')} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9'}}>⚙️ {t.navProfile}</div>
+                      <div onClick={handleLogout} className="menu-item" style={{padding: '12px 20px', cursor: 'pointer', color: '#dc2626', fontWeight: 'bold'}}>🚪 {t.logout}</div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="login-buttons-mobile" style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
+                  <button onClick={() => navigate('check-guest')} className="btn-login-nav" style={{background: 'none', color: '#475569', border: 'none', fontWeight: 'bold', cursor: 'pointer'}}>🔍 {t.checkGuestBtn}</button>
+                  <button className="btn-logout" onClick={() => navigate('login')} style={{background: '#0f172a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer'}}>{t.login}</button>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       </header>

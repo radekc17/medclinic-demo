@@ -35,3 +35,85 @@
 }
 
 .btn-status:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+/* --- WIDOK MOBILNY - APP.TSX --- */
+/* Domyślnie ukrywamy przycisk hamburgera na PC */
+.hamburger-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  /* Górny czarny pasek */
+  .top-bar-mobile {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .top-bar-info {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .top-bar-flags {
+    width: 100%;
+    justify-content: flex-start !important; /* Flagi do lewej pod adresem */
+  }
+
+  /* Hamburger Menu */
+  .nav-header-mobile {
+    width: 100% !important;
+  }
+  .hamburger-btn {
+    display: block !important;
+  }
+
+  /* Ukrywanie i pokazywanie linków */
+  .nav-links-container {
+    display: none !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100%;
+    gap: 20px !important;
+    margin-top: 15px !important;
+    padding-top: 15px !important;
+    border-top: 1px solid #e2e8f0;
+  }
+  .nav-links-container.open {
+    display: flex !important;
+  }
+
+  /* Układ linków w pionie */
+  .nav-links-mobile {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100%;
+    gap: 15px !important;
+  }
+  .btn-book-mobile {
+    width: 100% !important;
+  }
+  
+  /* Układ przycisków logowania w pionie */
+  .navbar-user-mobile {
+    width: 100% !important;
+  }
+  .login-buttons-mobile {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .btn-login-nav, .btn-logout, .btn-user-menu {
+    width: 100% !important;
+    margin-top: 5px !important;
+    text-align: center !important;
+  }
+  .btn-user-menu {
+    text-align: left !important;
+  }
+  /* Rozwijane menu usera nie zachodzi na ekran */
+  .dropdown-menu {
+    position: relative !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding-left: 10px !important;
+  }
+}
