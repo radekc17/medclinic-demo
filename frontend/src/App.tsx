@@ -259,9 +259,9 @@ function App() {
 
     if (currentView === 'my-appointments') return <div style={{padding: '50px 0'}}><MyAppointments lang={lang} /></div>;
 
-    // NAPRAWA: Usunąłem zdublowany nagłówek, który wchodził na ten z pliku DoctorsList!
+    // NAPRAWA: Zadbano o to, by nic nie wychodziło poza ekran na mobile (box-sizing i width 100%)
     return (
-      <div style={{padding: '60px 5vw', maxWidth: '1440px', margin: 'auto', boxSizing: 'border-box'}}>
+      <div style={{padding: '60px 5vw', maxWidth: '1440px', margin: 'auto', boxSizing: 'border-box', width: '100%'}}>
         {loading ? <div style={{textAlign:'center', padding: '50px'}}>Wczytywanie lekarzy...</div> : (
           <DoctorsList doctors={clinicSpecificDoctors} loading={loading} lang={lang} onBook={(doc) => { setPreselectedService(null); setSelectedDoctor(doc); }} />
         )}
@@ -287,7 +287,7 @@ function App() {
       );
   }
 
-  // Upewniamy się, że kliknięcie gdziekolwiek zamyka menu
+  // Upewniamy się, że kliknięcie gdziekolwiek zamyka otwarte menu języków i inne dropdowny
   return (
     <div className="app-container" onClick={() => { setIsMenuOpen(false); setIsMobileMenuOpen(false); setIsLangMenuOpen(false); }} style={{fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif', width: '100%', overflowX: 'hidden'}}> 
       <Toaster position="top-center" />
@@ -398,10 +398,11 @@ function App() {
           </div>
         </div>
 
-        {/* Główne Menu */}
-        <nav style={{ padding: '20px 5vw', maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }} onClick={(e) => e.stopPropagation()}>
+        {/* Główne Menu - dodano box-sizing: border-box */}
+        <nav style={{ padding: '20px 5vw', maxWidth: '1440px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px', boxSizing: 'border-box' }} onClick={(e) => e.stopPropagation()}>
           
           <div className="nav-header-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 'auto' }}>
+            {/* NAPRAWA: Usunięto duży nagłówek "MedClinic Centrala" stąd, by nie dublować z HomePage i DoctorsList */}
             <h1 onClick={() => navigate('home')} style={{cursor: 'pointer', margin: 0, fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-1px'}}>
               {activeClinicData?.name || t.title}
             </h1>

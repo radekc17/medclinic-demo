@@ -1,6 +1,7 @@
 /* =========================================
    GLOBALNY RESET & FIX NA TELEFONY
-   (Zabija poziomy pasek przewijania)
+   (Zabija poziomy pasek przewijania, 
+    naprawia szerokość białych boksów)
 ========================================= */
 * {
   box-sizing: border-box;
@@ -89,9 +90,11 @@ html, body {
     width: 100%;
     margin-bottom: 10px;
   }
+  /* Nowe menu flag dociągamy do lewej pod adresem, żeby nie wystawało */
   .top-bar-flags {
     width: 100%;
     justify-content: flex-start !important;
+    padding-left: 5px; /* Minimalny padding dla estetyki */
   }
 
   .nav-header-mobile {
@@ -101,16 +104,17 @@ html, body {
     display: block !important;
   }
 
-  /* Rozwijane Menu */
+  /* Rozwijane Menu - naprawa szerokości */
   .nav-links-container {
     display: none !important;
     flex-direction: column !important;
     align-items: flex-start !important;
-    width: 100%;
+    width: 100% !important;
     gap: 20px !important;
     margin-top: 15px !important;
     padding-top: 15px !important;
     border-top: 1px solid #e2e8f0;
+    box-sizing: border-box !important; /* Ważne, żeby padding nie rozpychał */
   }
   .nav-links-container.open {
     display: flex !important;
@@ -187,16 +191,38 @@ html, body {
   .doctors-header h2 {
     font-size: 2rem !important;
   }
+  /* Naprawa overfllow w pasku filtrów */
   .filters-bar {
     flex-direction: column !important; 
     align-items: stretch !important;
     padding: 15px !important;
     margin-bottom: 25px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   .filter-input-wrapper {
     min-width: 100% !important;
   }
+  /* =========================================
+     NAPRAWA: Wyśrodkowanie kart lekarzy!
+     (Zmieniamy grid na flex column z centrowaniem)
+  ========================================= */
   .doctors-grid {
-    grid-template-columns: 1fr !important; 
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    gap: 20px !important;
+  }
+  /* Ustawiamy maksymalną szerokość karty na mobile, by buttony pasowały */
+  .doctor-card {
+    width: min(100%, 350px) !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
