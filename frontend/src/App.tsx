@@ -113,8 +113,12 @@ function AppContent() {
     }
   };
 
-  useEffect(() => { loadUser(); fetchDoctorsAndClinics(); }, []);
+  useEffect(() => {
+    loadUser();
+    fetchDoctorsAndClinics();
+  }, []);
 
+  // SYNCHRONIZACJA JĘZYKA Z URL
   useEffect(() => {
     const parts = location.pathname.split('/');
     const urlLang = parts[1]?.toUpperCase();
@@ -123,6 +127,7 @@ function AppContent() {
     }
   }, [location.pathname]);
 
+  // OBSŁUGA KLINIKI Z URL
   useEffect(() => {
     const match = location.pathname.match(/\/klinika\/(\d+)/);
     if (match) {
@@ -166,7 +171,9 @@ function AppContent() {
     .then(fullUser => {
       setUser(fullUser);
       setIsMenuOpen(false);
-      if (fullUser.clinicId) setSelectedClinicId(fullUser.clinicId);
+      if (fullUser.clinicId) {
+        setSelectedClinicId(fullUser.clinicId);
+      }
       
       if (fullUser.role === 'DOCTOR') handleNavigate('doctor-panel');
       else if (fullUser.role === 'RECEPTIONIST') handleNavigate('reception-panel');
@@ -303,11 +310,13 @@ function AppContent() {
               <h1 className="logo-text">Med<span>Clinic</span></h1>
             </div>
 
-            <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {/* POPRAWKA: e.stopPropagation() zapobiega zamykaniu po kliknięciu w hamburgera */}
+            <button className="hamburger-btn" onClick={(e) => { e.stopPropagation(); setIsMobileMenuOpen(!isMobileMenuOpen); }}>
               {isMobileMenuOpen ? '✕' : '☰'}
             </button>
 
-            <div className={`nav-links-wrapper ${isMobileMenuOpen ? 'open' : ''}`}>
+            {/* POPRAWKA: Dodałem onClick z e.stopPropagation() również tu, by kliknięcie wewnątrz menu go nie zamykało */}
+            <div className={`nav-links-wrapper ${isMobileMenuOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
               <div className="primary-links">
                 <span className="nav-item" onClick={() => handleNavigate('home')} style={{color: currentView === 'home' ? '#2563eb' : 'inherit'}}>{t.navClinic}</span>
                 <span className="nav-item" onClick={() => handleNavigate('directory')} style={{color: currentView === 'directory' ? '#2563eb' : 'inherit'}}>{t.navOurDoctors}</span>
@@ -319,19 +328,49 @@ function AppContent() {
                 
                 {user ? (
                   <div className="user-nav-container">
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="pill-btn-outline user-btn">
+                    {/* POPRAWKA: e.stopPropagation() w menu użytkownika */}
+                    <button onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} className="pill-btn-outline user-btn">
                       👤 {user.name.split(' ')[0]} ▾
                     </button>
                     {isMenuOpen && (
-                      <div className="user-dropdown-modern">
+                      <div className="user-dropdown-modern" style={{position: 'absolute', top: '100%', right: 0, marginTop: '10px', background: 'white', border: '1px solid #f1f5f9', borderRadius: '20px', boxShadow: '0 15px 35px rgba(0,0,0,0.05)', minWidth: '260px', zIndex: 100, overflow: 'hidden', padding: '10px'}}>
                         {user.role === 'DOCTOR' && (
-                          <div onClick={() => handleNavigate('doctor-panel')} className="drop-item">👨‍⚕️ Pilot Wizyt</div>
+                          <>
+                            <div onClick={() => handleNavigate('doctor-panel')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>👨‍⚕️ Pilot Wizyt</div>
+                            <div onClick={() => handleNavigate('schedule')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 Mój Grafik</div>
+                          </>
                         )}
-                        {['RECEPTIONIST', 'MANAGER', 'ADMIN'].includes(user.role) && (
-                          <div onClick={() => handleNavigate('quick-search')} className="drop-item highlight">🔍 Wyszukaj Termin</div>
+                        {user.role === 'RECEPTIONIST' && (
+                          <>
+                            <div onClick={() => handleNavigate('quick-search')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#16a34a'}}>🔍 Wyszukaj Termin</div>
+                            <div onClick={() => handleNavigate('reception-panel')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🏢 Radar Gabinetów</div>
+                            <div onClick={() => handleNavigate('patients-registry')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🗂️ Kartoteka Pacjentów</div>
+                            <div onClick={() => handleNavigate('schedule')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 Grafik Pracy</div>
+                          </>
                         )}
-                        <div onClick={() => handleNavigate('profile')} className="drop-item">⚙️ {t.navProfile}</div>
-                        <div onClick={handleLogout} className="drop-item logout">🚪 {t.logout}</div>
+                        {(user.role === 'MANAGER' || user.role === 'ADMIN') && (
+                          <>
+                            <div className="menu-title" style={{fontSize: '0.75rem', color: '#94a3b8', padding: '10px 20px', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px'}}>Zarządzanie</div>
+                            <div onClick={() => handleNavigate('quick-search')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#16a34a'}}>🔍 Wyszukaj Termin</div>
+                            <div onClick={() => handleNavigate('schedule')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 Planowanie Grafiku</div>
+                            <div onClick={() => handleNavigate('patients-registry')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🗂️ Baza Pacjentów</div>
+                            <div onClick={() => handleNavigate('reception-panel')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>🏢 Podgląd Recepcji</div>
+                            {user.role === 'ADMIN' && (
+                              <>
+                                <div onClick={() => handleNavigate('settings')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>⚙️ Ustawienia Systemu</div>
+                                <div onClick={() => handleNavigate('tv-view')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#2563eb'}}>📺 Uruchom Ekran TV</div>
+                              </>
+                            )}
+                          </>
+                        )}
+                        {user.role === 'PATIENT' && (
+                          <>
+                             <div onClick={() => handleNavigate('list')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📅 {t.bookBtn}</div>
+                             <div onClick={() => handleNavigate('my-appointments')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>📋 {t.myAppointments}</div>
+                          </>
+                        )}
+                        <div onClick={() => handleNavigate('profile')} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, color: '#475569'}}>⚙️ {t.navProfile}</div>
+                        <div onClick={handleLogout} className="menu-item modern-menu-item" style={{padding: '12px 20px', cursor: 'pointer', borderRadius: '12px', fontWeight: 800, color: '#dc2626', borderTop: '1px solid #f1f5f9', marginTop: '5px'}}>🚪 {t.logout}</div>
                       </div>
                     )}
                   </div>
@@ -349,10 +388,10 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/pl" replace />} />
           
           <Route path="/:lang" element={
-            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => navigateUrl(`/${lang.toLowerCase()}/klinika/${id}`)} />
+            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => { navigateUrl(`/${lang.toLowerCase()}/klinika/${id}`); window.scrollTo(0, 0); }} />
           } />
           <Route path="/:lang/klinika/:clinicId" element={
-            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => navigateUrl(`/${lang.toLowerCase()}/klinika/${id}`)} />
+            <HomePage lang={lang} clinicData={activeClinicData} allClinics={clinics} onBookClick={() => handleNavigate('list')} onClinicSelect={(id) => { navigateUrl(`/${lang.toLowerCase()}/klinika/${id}`); window.scrollTo(0, 0); }} />
           } />
           <Route path="/:lang/nasi-lekarze" element={
             <DoctorsDirectory lang={lang} doctors={clinicSpecificDoctors} onBookDirectly={(doc: Doctor, svc?: any) => { setPreselectedService(svc); setSelectedDoctor(doc); }} />
