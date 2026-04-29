@@ -145,7 +145,7 @@ html, body {
 .time-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 /* =========================================
-   5. WIDOK MOBILNY (ULTRA CZYSTY)
+   5. WIDOK MOBILNY 
 ========================================= */
 .hamburger-btn { display: none; background: none; border: none; font-size: 2.2rem; cursor: pointer; color: #0f172a; }
 
@@ -204,6 +204,24 @@ html, body {
   .booking-modal-left { border-right: none; border-bottom: 1px solid #f1f5f9; padding: 25px; }
   .booking-modal-right { padding: 25px; }
   .booking-modal-content { width: 95%; max-height: 95vh; }
+
+  /* =========================================
+     PRZYWRÓCONA NAPRAWA ZDJĘCIA KOBIETY
+  ========================================= */
+  .split-section { 
+    flex-direction: column-reverse !important; 
+    height: auto !important;
+  }
+  .split-img { 
+    width: 100% !important; 
+    min-height: 350px !important; 
+    height: 350px !important;
+  }
+  .split-text { 
+    width: 100% !important; 
+    padding: 40px 20px !important;
+    text-align: left;
+  }
 }
 
 /* =========================================
