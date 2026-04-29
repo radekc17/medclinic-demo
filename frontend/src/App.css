@@ -62,6 +62,10 @@ html, body {
 .location-pill { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.85rem; color: var(--primary); }
 .location-pill select { border: none; background: transparent; font-weight: 800; color: var(--text-main); cursor: pointer; outline: none; }
 
+/* Desktop vs Mobile klinki */
+.desktop-clinic-selector { display: block; }
+.mobile-clinic-selector { display: none; }
+
 /* Flagi */
 .lang-selector-modern { position: relative; }
 .lang-selector-modern button { background: white; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 50px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 800; font-size: 0.8rem; }
@@ -141,7 +145,7 @@ html, body {
 .time-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 /* =========================================
-   5. WIDOK MOBILNY (KOMPAKTOWY NAGŁÓWEK)
+   5. WIDOK MOBILNY (ULTRA CZYSTY)
 ========================================= */
 .hamburger-btn { display: none; background: none; border: none; font-size: 2.2rem; cursor: pointer; color: #0f172a; }
 
@@ -152,59 +156,41 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  /* ==== TOP INFO BAR: KOMPAKTOWY GRID (To naprawia "kobyłę" na telefonie) ==== */
-  .top-info-bar { padding: 6px 0; }
+  /* NA PASKU ZOSTANIE TYLKO TELEFON I JĘZYK NA JEDNEJ LINII */
   .top-info-bar .header-container { 
-    display: grid; 
-    grid-template-columns: 1fr auto; 
-    gap: 8px 10px; 
-    padding: 4px 5vw; 
-    align-items: center;
+    flex-direction: row; 
+    justify-content: space-between; 
+    padding: 8px 5vw; 
+    gap: 0;
   }
+  .top-info-left { width: auto; flex-direction: row; }
+  .phone-pill { width: auto; padding: 6px 14px; font-size: 0.85rem; }
   
-  /* Rozpakowujemy lewą stronę, by elementy ułożyły się płasko w gridzie */
-  .top-info-left { display: contents; }
+  /* Chowamy selektor z górnego paska na telefonie */
+  .desktop-clinic-selector { display: none; }
   
-  /* Telefon - róg lewy górny */
-  .phone-pill { 
-    grid-column: 1; 
-    grid-row: 1; 
-    width: fit-content; 
-    padding: 4px 12px; 
-    font-size: 0.8rem; 
-    margin: 0; 
-    justify-self: start;
-  }
-  
-  /* Język - róg prawy górny */
-  .top-info-right { 
-    grid-column: 2; 
-    grid-row: 1; 
-  }
-  .lang-selector-modern button {
-    padding: 4px 10px;
-    font-size: 0.75rem;
-  }
-  
-  /* Lokalizacja - na środku na dole (drugi wiersz) */
-  .location-pill { 
-    grid-column: 1 / span 2; 
-    grid-row: 2; 
-    justify-content: center; 
+  /* Pokazujemy selektor w otwartym menu Hamburgera */
+  .mobile-clinic-selector { 
+    display: block; 
+    padding-bottom: 20px; 
+    border-bottom: 1px solid #f1f5f9; 
+    margin-bottom: 20px; 
     width: 100%; 
-    margin-top: 2px;
-    font-size: 0.8rem;
   }
-  .location-pill select {
-    font-size: 0.8rem;
+  .mobile-menu-label { 
+    font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; 
+    font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; display: block; 
+  }
+  .mobile-location-pill select { 
+    background: #f8fafc; padding: 10px; border-radius: 12px; 
+    border: 1px solid #e2e8f0; width: 100%; font-size: 0.95rem; 
   }
 
-  /* Menu mobilne pod hamburgerem */
+  /* Hamburger Menu */
   .hamburger-btn { display: block; }
-  
   .nav-links-wrapper {
     display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; 
-    flex-direction: column; padding: 30px 20px; gap: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    flex-direction: column; padding: 30px 5vw; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     border-top: 1px solid #f1f5f9; z-index: 1000;
   }
   .nav-links-wrapper.open { display: flex; }

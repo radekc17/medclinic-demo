@@ -21,7 +21,6 @@ import { Toaster, toast } from 'react-hot-toast';
 
 type View = 'home' | 'directory' | 'list' | 'login' | 'register' | 'my-appointments' | 'check-guest' | 'doctor-panel' | 'profile' | 'reception-panel' | 'schedule' | 'patients-registry' | 'settings' | 'tv-view' | 'quick-search';
 
-// MAPOWANIE: Ścieżki bez języka (będą doklejane dynamicznie)
 const viewToPath: Record<View, string> = {
   'home': '',
   'directory': '/nasi-lekarze',
@@ -65,7 +64,6 @@ function AppContent() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [prefilledPatient, setPrefilledPatient] = useState<any>(null);
 
-  // Inteligentne wykrywanie aktywnego widoku do podświetleń w menu
   const currentView = (Object.keys(viewToPath) as View[]).find(key => 
     location.pathname.includes(viewToPath[key]) && viewToPath[key] !== ''
   ) || 'home';
@@ -118,7 +116,6 @@ function AppContent() {
     fetchDoctorsAndClinics();
   }, []);
 
-  // SYNCHRONIZACJA JĘZYKA Z URL
   useEffect(() => {
     const parts = location.pathname.split('/');
     const urlLang = parts[1]?.toUpperCase();
@@ -127,7 +124,6 @@ function AppContent() {
     }
   }, [location.pathname]);
 
-  // OBSŁUGA KLINIKI Z URL
   useEffect(() => {
     const match = location.pathname.match(/\/klinika\/(\d+)/);
     if (match) {
@@ -251,9 +247,7 @@ function AppContent() {
         />
       )}
 
-      <header className="modern-header" style={{ background: 'rgba(255,255,255,0.98)', borderBottom: '1px solid #f1f5f9', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(10px)' }}>
-        
-        {/* TOP BAR INFO */}
+      <header className="modern-header" onClick={(e) => e.stopPropagation()}>
         <div className="top-info-bar">
           <div className="header-container">
             <div className="top-info-left">
@@ -262,23 +256,25 @@ function AppContent() {
                 <span className="text">{rawPhone}</span>
               </a>
               
-              {canSwitchClinic && (
-                <div className="location-pill">
-                  <span className="icon">📍</span>
-                  <select 
-                    value={selectedClinicId || ''} 
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val) navigateUrl(`/${lang.toLowerCase()}/klinika/${val}`); 
-                      else navigateUrl(`/${lang.toLowerCase()}`); 
-                    }}
-                    style={{ background: 'transparent', border: 'none', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer', outline: 'none' }}
-                  >
-                    <option value="">Wszystkie placówki</option>
-                    {clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
-              )}
+              {/* Desktop Clinic Selector (Hides on Mobile) */}
+              <div className="desktop-clinic-selector">
+                {canSwitchClinic && (
+                  <div className="location-pill">
+                    <span className="icon">📍</span>
+                    <select 
+                      value={selectedClinicId || ''} 
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val) navigateUrl(`/${lang.toLowerCase()}/klinika/${val}`); 
+                        else navigateUrl(`/${lang.toLowerCase()}`); 
+                      }}
+                    >
+                      <option value="">Wszystkie placówki</option>
+                      {clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="top-info-right">
@@ -310,13 +306,35 @@ function AppContent() {
               <h1 className="logo-text">Med<span>Clinic</span></h1>
             </div>
 
-            {/* POPRAWKA: e.stopPropagation() zapobiega zamykaniu po kliknięciu w hamburgera */}
             <button className="hamburger-btn" onClick={(e) => { e.stopPropagation(); setIsMobileMenuOpen(!isMobileMenuOpen); }}>
               {isMobileMenuOpen ? '✕' : '☰'}
             </button>
 
-            {/* POPRAWKA: Dodałem onClick z e.stopPropagation() również tu, by kliknięcie wewnątrz menu go nie zamykało */}
             <div className={`nav-links-wrapper ${isMobileMenuOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
+              
+              {/* Mobile Clinic Selector (Shows ONLY on Mobile inside menu) */}
+              <div className="mobile-clinic-selector">
+                {canSwitchClinic && (
+                  <>
+                    <span className="mobile-menu-label">Zmień placówkę</span>
+                    <div className="location-pill mobile-location-pill">
+                      <span className="icon">📍</span>
+                      <select 
+                        value={selectedClinicId || ''} 
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) navigateUrl(`/${lang.toLowerCase()}/klinika/${val}`); 
+                          else navigateUrl(`/${lang.toLowerCase()}`); 
+                        }}
+                      >
+                        <option value="">Wszystkie placówki</option>
+                        {clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                  </>
+                )}
+              </div>
+
               <div className="primary-links">
                 <span className="nav-item" onClick={() => handleNavigate('home')} style={{color: currentView === 'home' ? '#2563eb' : 'inherit'}}>{t.navClinic}</span>
                 <span className="nav-item" onClick={() => handleNavigate('directory')} style={{color: currentView === 'directory' ? '#2563eb' : 'inherit'}}>{t.navOurDoctors}</span>
@@ -328,7 +346,6 @@ function AppContent() {
                 
                 {user ? (
                   <div className="user-nav-container">
-                    {/* POPRAWKA: e.stopPropagation() w menu użytkownika */}
                     <button onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} className="pill-btn-outline user-btn">
                       👤 {user.name.split(' ')[0]} ▾
                     </button>
